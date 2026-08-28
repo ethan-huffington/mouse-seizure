@@ -31,3 +31,7 @@ artifacts/**
 wandb/
 mlruns/
 lightning_logs/
+
+# Credentials / access notes — never commit
+data_source_login.md
+*.secret
