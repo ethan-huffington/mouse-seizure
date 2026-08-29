@@ -103,6 +103,31 @@ train and test have identical bandwidth despite different acquisition filters.
   measurable. Document as an explicit departure from the source specification.
 - Choose the common resample rate (400 Hz is the floor set by the test split).
 
+## Phase 1 baseline (recorded, do not lose)
+
+Leave-one-animal-out over the 8 training mice, 40 recordings, thresholds fixed at 0.60/0.30.
+
+| metric | value |
+|---|---|
+| event F1 | **0.504 ± 0.192** |
+| event sensitivity | 0.980 |
+| event precision | 0.365 |
+| false alarms / hour | 44.6 |
+| window AUPRC | 0.712 |
+
+**Threshold alone moves event F1 from 0.504 to 0.796 and false alarms from 44.6/h to
+3.45/h, with an unchanged model** (operating curve in `artifacts/phase1/`). This is the
+project's central claim, measured: the classifier is not the bottleneck. Do not tune
+CatBoost before the operating point and post-processing are right.
+
+Known Phase 2 work items, in priority order:
+1. **Threshold/calibration.** `auto_class_weights="Balanced"` distorts the class prior, so
+   predicted probabilities are not calibrated and 0.60/0.30 sits far too permissive.
+2. **Burden is badly biased** — predicted 66.9 events/h vs true 23.0, correlation 0.08.
+   Burden agreement is a headline deliverable and is currently the weakest result.
+3. **`train_M2` is the hardest animal** (event F1 0.194, window AUPRC 0.619). It is also
+   the lowest-burden animal at 1.1-1.6% positive, so the model has least signal there.
+
 ## Phases
 
 0. **Data gate** (now) — verify montage, sampling rate, label format; plot real SWDs. EDA notebook.

@@ -222,16 +222,22 @@ def main() -> int:
             pl.DataFrame(sweep_rows)
             .group_by("high", "low")
             .agg(
-                pl.col("event_sensitivity").mean().round(3),
-                pl.col("event_precision").mean().round(3),
-                pl.col("event_f1").mean().round(3),
-                pl.col("false_alarms_per_hour").mean().round(2),
+                pl.col("event_sensitivity").drop_nans().mean().round(3),
+                pl.col("event_precision").drop_nans().mean().round(3),
+                pl.col("event_f1").drop_nans().mean().round(3),
+                pl.col("false_alarms_per_hour").drop_nans().mean().round(2),
+                pl.col("event_precision").is_nan().sum().alias("n_no_detections"),
             )
             .sort("high")
         )
         print("\n=== operating curve (reported, not tuned) ===")
         print(curve)
         curve.write_parquet(ARTIFACTS / "operating_curve.parquet")
+        # Keep the per-recording rows too, so the curve can be re-aggregated
+        # without repeating the hour-long sweep.
+        pl.DataFrame(sweep_rows).write_parquet(
+            ARTIFACTS / "operating_curve_rows.parquet"
+        )
 
     summary = {
         "n_folds": len(folds),
