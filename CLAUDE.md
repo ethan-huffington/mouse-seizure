@@ -74,6 +74,22 @@ animal-dependent. **Baseline theta sits at the same ~5.9 Hz peak as SWD** — pe
 alone does not separate them, so amplitude and harmonic structure carry the discrimination.
 This is the central feature-engineering problem.
 
+## Published benchmark (AugUNet1D, arXiv 2601.00459)
+
+The dataset's own paper reports **sample-level** precision 0.91 / recall 0.90, per-mouse
+F1 0.87-0.93, versus the "Twin Peaks" algorithmic method at precision 0.67 / recall 0.81.
+Their audit numbers (961 h, 22,637 SWDs) match ours (962.2 h, 22,570 events), confirming
+the loader.
+
+**Their headline metric is per-timepoint, not event-level.** Our event-level numbers are
+therefore not comparable to theirs. Report sample-level precision/recall/F1 as a secondary
+metric purely so one directly comparable number exists.
+
+They resample everything to **100 Hz**. We resample to **400 Hz** instead: the test split
+is then untouched, and the sharp spike morphology that the line-length and spike-rate
+features depend on survives. Low-pass both splits to a common ceiling after resampling so
+train and test have identical bandwidth despite different acquisition filters.
+
 ## Open
 
 - Labels are single-scorer, so Cohen's κ against a human–human agreement ceiling is not
