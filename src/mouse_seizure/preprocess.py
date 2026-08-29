@@ -27,7 +27,9 @@ def resample_to(x: np.ndarray, fs_in: float, fs_out: float = TARGET_FS) -> np.nd
     return signal.resample_poly(x, ratio.numerator, ratio.denominator)
 
 
-def resample_labels(y: np.ndarray, fs_in: float, fs_out: float = TARGET_FS) -> np.ndarray:
+def resample_labels(
+    y: np.ndarray, fs_in: float, fs_out: float = TARGET_FS
+) -> np.ndarray:
     """Resample a binary label array by nearest-neighbour index mapping.
 
     Labels must not be filtered: interpolating a 0/1 mask invents fractional

@@ -8,14 +8,17 @@ authors = [
 ]
 requires-python = ">=3.13"
 dependencies = [
+    "catboost>=1.2.10",
     "h5py>=3.16.0",
     "matplotlib>=3.11.1",
     "numpy>=2.5.2",
     "pandas>=3.0.5",
     "polars>=1.44.1",
+    "pyarrow>=25.0.1",
     "requests>=2.34.2",
     "scikit-learn>=1.9.0",
     "scipy>=1.18.1",
+    "timescoring>=0.0.7",
 ]
 
 [project.scripts]
