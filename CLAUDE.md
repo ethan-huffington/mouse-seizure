@@ -68,11 +68,18 @@ not documented:**
   run-length detection or durations come out negative.
 - Annotators applied a **~1 s minimum duration** floor; use that for the min-duration rule.
 
-**Signal facts:** SWD fundamental ~5.9 Hz; events median 3.7–5.9 s (much longer than the
-~1 s the source PDF assumed); positive fraction 1–7%; event rate 8.6–35.6/h and genuinely
-animal-dependent. **Baseline theta sits at the same ~5.9 Hz peak as SWD** — peak frequency
-alone does not separate them, so amplitude and harmonic structure carry the discrimination.
-This is the central feature-engineering problem.
+**Signal facts:** SWD fundamental stable at 5.5–5.9 Hz across every recording; events
+median 5.6 s pooled (much longer than the ~1 s the source PDF assumed); positive fraction
+1–7%; event rate 8.6–35.6/h and genuinely animal-dependent.
+
+**The SWD band is not exclusive to SWDs — stated carefully, because the naive version is
+wrong.** Averaged over a whole session the baseline spectrum peaks at 1.6–2.0 Hz, because
+sleep dominates the average; it looks nothing like an SWD. But the classifier sees single
+windows, and per window **22–32% of baseline windows have their spectral peak in 5–7 Hz**
+(rodent theta), while **44–75% of baseline windows exceed the 5th-percentile SWD window**
+on 4–9 Hz relative band power. Band power at the fundamental is therefore a weak
+discriminator on its own; harmonics, spike morphology and rhythmicity carry the
+separation. This is the central feature-engineering problem.
 
 ## Published benchmark (AugUNet1D, arXiv 2601.00459)
 

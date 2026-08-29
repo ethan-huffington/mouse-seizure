@@ -77,10 +77,22 @@ number that additionally measures robustness to acquisition shift.
 
 ### The central feature-engineering problem
 
-**Baseline EEG peaks at ~5.9 Hz too** — rodent theta rhythm occupies the same band as the
-SWD fundamental. Peak frequency alone cannot separate seizure from normal background. The
-discrimination has to come from amplitude, harmonic structure, and rhythmic regularity.
-This is the substance of the feature work.
+The SWD fundamental is stable at **5.5–5.9 Hz** in every recording checked. The background
+is not so clean, and the claim needs stating carefully because the obvious version is wrong.
+
+Averaged across a whole session, the baseline spectrum peaks at **1.6–2.0 Hz** — sleep
+dominates the average, and it looks nothing like an SWD. But the classifier never sees a
+session average; it sees one 2 s window. Per window:
+
+- **22–32% of baseline windows have their spectral peak in 5–7 Hz** — rodent theta rhythm,
+  entirely normal during exploration and REM sleep, sitting exactly on the SWD fundamental.
+- **44–75% of baseline windows exceed the 5th-percentile SWD window** on 4–9 Hz relative
+  band power.
+
+So band power at the fundamental is a weak discriminator on its own. The separation has to
+come from **harmonics** (a spike-and-wave complex is not a sinusoid and deposits energy at
+12/18/24 Hz; theta does not), **morphology** (the sharp spike), and **rhythmicity**
+(regular spike train vs. irregular oscillation). This is the substance of the feature work.
 
 ## 3. Ground truth
 

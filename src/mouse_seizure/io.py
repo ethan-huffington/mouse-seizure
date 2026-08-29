@@ -22,6 +22,8 @@ from pathlib import Path
 import h5py
 import numpy as np
 
+from mouse_seizure.config import RAW_DATA
+
 TRAIN_RE = re.compile(r"^Day(?P<day>\d+)_M(?P<mouse>\d+)$")
 TEST_RE = re.compile(r"^(?P<date>\d{8})_M(?P<mouse>\d+)_MAT$")
 
@@ -110,6 +112,6 @@ def events(labels: np.ndarray, fs: float) -> np.ndarray:
     return np.column_stack([starts, ends]) / fs
 
 
-def find_recordings(root: str | Path = "data/raw") -> list[Path]:
-    """All dataset files under ``root``, sorted by name."""
-    return sorted(Path(root).glob("*.mat"))
+def find_recordings(root: str | Path | None = None) -> list[Path]:
+    """All dataset files under ``root`` (default: the project's data/raw)."""
+    return sorted(Path(root or RAW_DATA).glob("*.mat"))
