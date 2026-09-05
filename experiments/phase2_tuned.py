@@ -244,6 +244,11 @@ def main() -> int:
     ap.add_argument(
         "--ablate", action="store_true", help="also run feature-group ablations"
     )
+    ap.add_argument(
+        "--combos",
+        action="store_true",
+        help="run multi-group removals that test redundancy between families",
+    )
     args = ap.parse_args()
 
     print("=== full feature set, nested threshold selection ===", flush=True)
@@ -281,6 +286,34 @@ def main() -> int:
             f"  precision {best['event_precision']:.3f}"
             f"  FA/h {best['false_alarms_per_hour']:.2f}"
         )
+
+    if args.combos:
+        # Single-group ablation cannot distinguish "useless" from "redundant with
+        # another group". Removing two families at once does: if dropping both
+        # costs far more than either alone, they were carrying the same
+        # information and only looked expendable individually.
+        combos = {
+            "spectral+artifact": ["spectral", "artifact"],
+            "spectral+wavelet": ["spectral", "wavelet"],
+            "wavelet+artifact": ["wavelet", "artifact"],
+        }
+        print("\n=== multi-group removals ===", flush=True)
+        for name, groups in combos.items():
+            drop = {c for g in groups for c in FEATURE_GROUPS[g]}
+            columns = [c for c in FEATURE_NAMES if c not in drop]
+            res = run(columns, f"without_{name}", verbose=False)
+            f1 = float(np.nanmean(res["event_f1"].to_numpy()))
+            delta = f1 - summary["full"]["event_f1"]
+            summary[f"without_{name}"] = {
+                "event_f1": f1,
+                "delta": delta,
+                "n_features": len(columns),
+            }
+            print(
+                f"  without {name:20s} {len(columns):2d} features  "
+                f"F1 {f1:.3f}  ({delta:+.3f})",
+                flush=True,
+            )
 
     if args.ablate:
         print("\n=== ablations (leave one feature group out) ===", flush=True)
