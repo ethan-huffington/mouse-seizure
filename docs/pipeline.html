@@ -224,6 +224,13 @@
   }
   .pivot b { color: var(--ink); font-weight: 600; }
 
+  figure.detail {
+    padding: 1.25rem 0.75rem 0.85rem;
+    background: var(--bg);
+    margin-top: 0.25rem;
+  }
+  figure.detail figcaption { margin-top: 1rem; padding-top: 0.75rem; font-size: 0.82rem; }
+
   .pending {
     font-family: var(--mono);
     font-size: 0.72rem;
@@ -285,7 +292,8 @@
       the animal seizes and for how long. The data changes form five times on the way.
     </p>
     <dl class="facts">
-      <div class="fact"><dt>Recordings</dt><dd>40 &middot; 8 mice</dd></div>
+      <div class="fact"><dt>In use</dt><dd>40 files &middot; 8 mice</dd></div>
+      <div class="fact"><dt>Held back</dt><dd>10 files &middot; 10 mice</dd></div>
       <div class="fact"><dt>Signal</dt><dd>962 h</dd></div>
       <div class="fact"><dt>Annotated events</dt><dd>22,570</dd></div>
       <div class="fact"><dt>Channels</dt><dd>1</dd></div>
@@ -346,9 +354,9 @@
           <line x1="280" y1="190" x2="280" y2="238" stroke="currentColor"
                 stroke-width="1.5" marker-end="url(#ar)"></line>
           <text x="478" y="210" font-family="IBM Plex Mono, monospace" font-size="11"
-                fill="currentColor">40 recordings, 962 h</text>
+                fill="currentColor">40 recordings &middot; 8 mice</text>
           <text x="478" y="226" font-family="IBM Plex Mono, monospace" font-size="11"
-                fill="currentColor" opacity="0.6">1000 Hz train / 400 Hz test</text>
+                fill="currentColor" opacity="0.6">10 files held back entirely</text>
 
           <!-- STAGE 2 -->
           <rect x="100" y="240" width="360" height="96" rx="8"
@@ -520,6 +528,100 @@
             look like a modelling failure. Four test files also claim the same animal ID, so
             animals are keyed by filename instead.
           </p>
+
+          <figure class="detail">
+            <div class="scroller">
+              <svg viewBox="0 0 660 330" role="img"
+                   aria-label="The dataset ships pre-split into two recording campaigns: 8 mice recorded over five days each at 1000 hertz, and 10 different mice recorded for one day each at 400 hertz. We cross-validate inside the first campaign only and leave the second entirely untouched.">
+                <text x="20" y="24" font-family="Archivo, sans-serif" font-size="14" font-weight="600" fill="currentColor">18 mice, two recording campaigns, one split we did not choose</text>
+
+                <text x="20" y="54" font-family="IBM Plex Mono, monospace" font-size="11" font-weight="600" fill="#2a78d6">CAMPAIGN A &mdash; &ldquo;train&rdquo; in the filenames</text>
+                <text x="20" y="70" font-family="IBM Plex Mono, monospace" font-size="10" fill="currentColor" opacity="0.6">DayX_MZ.mat</text>
+                <rect x="34" y="84" width="15" height="12" rx="2" fill="#2a78d6" opacity="0.55"></rect>
+                <rect x="54" y="84" width="15" height="12" rx="2" fill="#2a78d6" opacity="0.55"></rect>
+                <rect x="74" y="84" width="15" height="12" rx="2" fill="#2a78d6" opacity="0.55"></rect>
+                <rect x="94" y="84" width="15" height="12" rx="2" fill="#2a78d6" opacity="0.55"></rect>
+                <rect x="114" y="84" width="15" height="12" rx="2" fill="#2a78d6" opacity="0.55"></rect>
+                <rect x="34" y="101" width="15" height="12" rx="2" fill="#2a78d6" opacity="0.55"></rect>
+                <rect x="54" y="101" width="15" height="12" rx="2" fill="#2a78d6" opacity="0.55"></rect>
+                <rect x="74" y="101" width="15" height="12" rx="2" fill="#2a78d6" opacity="0.55"></rect>
+                <rect x="94" y="101" width="15" height="12" rx="2" fill="#2a78d6" opacity="0.55"></rect>
+                <rect x="114" y="101" width="15" height="12" rx="2" fill="#2a78d6" opacity="0.55"></rect>
+                <rect x="34" y="118" width="15" height="12" rx="2" fill="#2a78d6" opacity="0.55"></rect>
+                <rect x="54" y="118" width="15" height="12" rx="2" fill="#2a78d6" opacity="0.55"></rect>
+                <rect x="74" y="118" width="15" height="12" rx="2" fill="#2a78d6" opacity="0.55"></rect>
+                <rect x="94" y="118" width="15" height="12" rx="2" fill="#2a78d6" opacity="0.55"></rect>
+                <rect x="114" y="118" width="15" height="12" rx="2" fill="#2a78d6" opacity="0.55"></rect>
+                <rect x="34" y="135" width="15" height="12" rx="2" fill="#2a78d6" opacity="0.55"></rect>
+                <rect x="54" y="135" width="15" height="12" rx="2" fill="#2a78d6" opacity="0.55"></rect>
+                <rect x="74" y="135" width="15" height="12" rx="2" fill="#2a78d6" opacity="0.55"></rect>
+                <rect x="94" y="135" width="15" height="12" rx="2" fill="#2a78d6" opacity="0.55"></rect>
+                <rect x="114" y="135" width="15" height="12" rx="2" fill="#2a78d6" opacity="0.55"></rect>
+                <rect x="34" y="152" width="15" height="12" rx="2" fill="#2a78d6" opacity="0.55"></rect>
+                <rect x="54" y="152" width="15" height="12" rx="2" fill="#2a78d6" opacity="0.55"></rect>
+                <rect x="74" y="152" width="15" height="12" rx="2" fill="#2a78d6" opacity="0.55"></rect>
+                <rect x="94" y="152" width="15" height="12" rx="2" fill="#2a78d6" opacity="0.55"></rect>
+                <rect x="114" y="152" width="15" height="12" rx="2" fill="#2a78d6" opacity="0.55"></rect>
+                <rect x="34" y="169" width="15" height="12" rx="2" fill="#2a78d6" opacity="0.55"></rect>
+                <rect x="54" y="169" width="15" height="12" rx="2" fill="#2a78d6" opacity="0.55"></rect>
+                <rect x="74" y="169" width="15" height="12" rx="2" fill="#2a78d6" opacity="0.55"></rect>
+                <rect x="94" y="169" width="15" height="12" rx="2" fill="#2a78d6" opacity="0.55"></rect>
+                <rect x="114" y="169" width="15" height="12" rx="2" fill="#2a78d6" opacity="0.55"></rect>
+                <rect x="34" y="186" width="15" height="12" rx="2" fill="#2a78d6" opacity="0.55"></rect>
+                <rect x="54" y="186" width="15" height="12" rx="2" fill="#2a78d6" opacity="0.55"></rect>
+                <rect x="74" y="186" width="15" height="12" rx="2" fill="#2a78d6" opacity="0.55"></rect>
+                <rect x="94" y="186" width="15" height="12" rx="2" fill="#2a78d6" opacity="0.55"></rect>
+                <rect x="114" y="186" width="15" height="12" rx="2" fill="#2a78d6" opacity="0.55"></rect>
+                <rect x="34" y="203" width="15" height="12" rx="2" fill="#2a78d6" opacity="0.55"></rect>
+                <rect x="54" y="203" width="15" height="12" rx="2" fill="#2a78d6" opacity="0.55"></rect>
+                <rect x="74" y="203" width="15" height="12" rx="2" fill="#2a78d6" opacity="0.55"></rect>
+                <rect x="94" y="203" width="15" height="12" rx="2" fill="#2a78d6" opacity="0.55"></rect>
+                <rect x="114" y="203" width="15" height="12" rx="2" fill="#2a78d6" opacity="0.55"></rect>
+                <text x="150" y="96" font-family="IBM Plex Sans, sans-serif" font-size="12" fill="currentColor"><tspan font-weight="600">8 mice &times; 5 days = 40 files</tspan></text>
+                <text x="150" y="116" font-family="IBM Plex Mono, monospace" font-size="11" fill="currentColor" opacity="0.75">1000 Hz</text>
+                <text x="150" y="133" font-family="IBM Plex Mono, monospace" font-size="11" fill="currentColor" opacity="0.75">22&ndash;26 h, full sessions</text>
+                <text x="150" y="150" font-family="IBM Plex Mono, monospace" font-size="11" fill="currentColor" opacity="0.75">962 h &middot; 22,570 events</text>
+                <text x="150" y="176" font-family="IBM Plex Sans, sans-serif" font-size="11" fill="currentColor" opacity="0.7">one row = one mouse</text>
+
+                <text x="380" y="54" font-family="IBM Plex Mono, monospace" font-size="11" font-weight="600" fill="currentColor" opacity="0.75">CAMPAIGN B &mdash; &ldquo;test&rdquo; in the filenames</text>
+                <text x="380" y="70" font-family="IBM Plex Mono, monospace" font-size="10" fill="currentColor" opacity="0.6">20240209_MZ_MAT.mat</text>
+                <rect x="392" y="84" width="15" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="1" stroke-dasharray="2 2" opacity="0.6"></rect>
+                <rect x="412" y="84" width="15" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="1" stroke-dasharray="2 2" opacity="0.6"></rect>
+                <rect x="392" y="101" width="15" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="1" stroke-dasharray="2 2" opacity="0.6"></rect>
+                <rect x="412" y="101" width="15" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="1" stroke-dasharray="2 2" opacity="0.6"></rect>
+                <rect x="392" y="118" width="15" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="1" stroke-dasharray="2 2" opacity="0.6"></rect>
+                <rect x="412" y="118" width="15" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="1" stroke-dasharray="2 2" opacity="0.6"></rect>
+                <rect x="392" y="135" width="15" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="1" stroke-dasharray="2 2" opacity="0.6"></rect>
+                <rect x="412" y="135" width="15" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="1" stroke-dasharray="2 2" opacity="0.6"></rect>
+                <rect x="392" y="152" width="15" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="1" stroke-dasharray="2 2" opacity="0.6"></rect>
+                <rect x="412" y="152" width="15" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="1" stroke-dasharray="2 2" opacity="0.6"></rect>
+                <text x="440" y="96" font-family="IBM Plex Sans, sans-serif" font-size="12" fill="currentColor"><tspan font-weight="600">10 different mice &times; 1 day</tspan></text>
+                <text x="440" y="116" font-family="IBM Plex Mono, monospace" font-size="11" fill="currentColor" opacity="0.75">400 Hz</text>
+                <text x="440" y="133" font-family="IBM Plex Mono, monospace" font-size="11" fill="currentColor" opacity="0.75">2&ndash;7 h, cropped at</text>
+                <text x="440" y="150" font-family="IBM Plex Mono, monospace" font-size="11" fill="currentColor" opacity="0.75">exactly 100 seizures</text>
+
+                <line x1="358" y1="44" x2="358" y2="250" stroke="#c25219" stroke-width="1.5" stroke-dasharray="5 4"></line>
+                <text x="352" y="240" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="#c25219" transform="rotate(-90 352 240)">the dataset&rsquo;s own split</text>
+
+                <line x1="20" y1="212" x2="330" y2="212" stroke="currentColor" stroke-width="1" opacity="0.25"></line>
+                <text x="20" y="234" font-family="IBM Plex Sans, sans-serif" font-size="12" font-weight="600" fill="#2a78d6">Our split lives entirely inside Campaign A</text>
+                <text x="20" y="252" font-family="IBM Plex Sans, sans-serif" font-size="11.5" fill="currentColor" opacity="0.85">8 folds. Each holds out 1 mouse to test on, 1 to pick the</text>
+                <text x="20" y="268" font-family="IBM Plex Sans, sans-serif" font-size="11.5" fill="currentColor" opacity="0.85">threshold on, and trains on the remaining 6.</text>
+
+                <line x1="380" y1="212" x2="640" y2="212" stroke="currentColor" stroke-width="1" opacity="0.25"></line>
+                <text x="380" y="234" font-family="IBM Plex Sans, sans-serif" font-size="12" font-weight="600" fill="currentColor">Campaign B: never loaded</text>
+                <text x="380" y="252" font-family="IBM Plex Sans, sans-serif" font-size="11.5" fill="currentColor" opacity="0.85">Reserved for one like-for-like comparison</text>
+                <text x="380" y="268" font-family="IBM Plex Sans, sans-serif" font-size="11.5" fill="currentColor" opacity="0.85">against the published benchmark, in Phase 3.</text>
+
+                <text x="20" y="308" font-family="IBM Plex Sans, sans-serif" font-size="11.5" fill="currentColor" opacity="0.7">The authors&rsquo; line separates animal, session <tspan font-style="italic">and</tspan> recording hardware at once &mdash; so a drop across it cannot be blamed on any one cause.</text>
+              </svg>
+            </div>
+            <figcaption>
+              Why the page counts 8 mice and not 18. The shipped train/test division is a
+              property of how the data was collected, not a modelling choice, so we replace
+              it with leave-one-animal-out inside a single campaign.
+            </figcaption>
+          </figure>
         </div>
       </article>
 
@@ -541,6 +643,70 @@
             5.9 Hz rhythm; too long and a brief seizure is diluted by surrounding baseline.
             2 seconds sits inside a typical 5.6 s event while still resolving to about 0.5 Hz.
           </p>
+
+          <figure class="detail">
+            <div class="scroller">
+              <svg viewBox="0 0 660 360" role="img"
+                   aria-label="Four conditioning operations in sequence: resample to 400 hertz, band-pass 1 to 100 hertz with a zero-phase filter, z-score per session, then cut into 2 second windows every 0.5 seconds. Because windows are four times longer than the step between them, every moment of signal is covered by four overlapping windows.">
+                <text x="20" y="24" font-family="Archivo, sans-serif" font-size="14" font-weight="600" fill="currentColor">Four operations put every recording on the same footing</text>
+
+                <rect x="20" y="44" width="140" height="66" rx="6" fill="var(--surface-2)" stroke="currentColor" stroke-width="1" opacity="0.9"></rect>
+                <text x="32" y="64" font-family="IBM Plex Mono, monospace" font-size="11" font-weight="600" fill="currentColor">1 &middot; resample</text>
+                <text x="32" y="82" font-family="IBM Plex Sans, sans-serif" font-size="11" fill="currentColor" opacity="0.8">1000 Hz &rarr; 400 Hz</text>
+                <text x="32" y="98" font-family="IBM Plex Sans, sans-serif" font-size="11" fill="currentColor" opacity="0.65">polyphase, ratio 2/5</text>
+
+                <rect x="180" y="44" width="140" height="66" rx="6" fill="var(--surface-2)" stroke="currentColor" stroke-width="1" opacity="0.9"></rect>
+                <text x="192" y="64" font-family="IBM Plex Mono, monospace" font-size="11" font-weight="600" fill="currentColor">2 &middot; band-pass</text>
+                <text x="192" y="82" font-family="IBM Plex Sans, sans-serif" font-size="11" fill="currentColor" opacity="0.8">1&ndash;100 Hz, zero-phase</text>
+                <text x="192" y="98" font-family="IBM Plex Sans, sans-serif" font-size="11" fill="currentColor" opacity="0.65">kills drift, equalises bandwidth</text>
+
+                <rect x="340" y="44" width="140" height="66" rx="6" fill="var(--surface-2)" stroke="currentColor" stroke-width="1" opacity="0.9"></rect>
+                <text x="352" y="64" font-family="IBM Plex Mono, monospace" font-size="11" font-weight="600" fill="currentColor">3 &middot; z-score</text>
+                <text x="352" y="82" font-family="IBM Plex Sans, sans-serif" font-size="11" fill="currentColor" opacity="0.8">per session</text>
+                <text x="352" y="98" font-family="IBM Plex Sans, sans-serif" font-size="11" fill="currentColor" opacity="0.65">units are arbitrary</text>
+
+                <rect x="500" y="44" width="140" height="66" rx="6" fill="var(--surface-2)" stroke="currentColor" stroke-width="1" opacity="0.9"></rect>
+                <text x="512" y="64" font-family="IBM Plex Mono, monospace" font-size="11" font-weight="600" fill="currentColor">4 &middot; window</text>
+                <text x="512" y="82" font-family="IBM Plex Sans, sans-serif" font-size="11" fill="currentColor" opacity="0.8">2.0 s every 0.5 s</text>
+                <text x="512" y="98" font-family="IBM Plex Sans, sans-serif" font-size="11" fill="currentColor" opacity="0.65">strided view, no copy</text>
+
+                <line x1="160" y1="77" x2="178" y2="77" stroke="currentColor" stroke-width="1.5" marker-end="url(#ar)"></line>
+                <line x1="320" y1="77" x2="338" y2="77" stroke="currentColor" stroke-width="1.5" marker-end="url(#ar)"></line>
+                <line x1="480" y1="77" x2="498" y2="77" stroke="currentColor" stroke-width="1.5" marker-end="url(#ar)"></line>
+
+                <text x="20" y="150" font-family="Archivo, sans-serif" font-size="14" font-weight="600" fill="currentColor">Why the windows overlap</text>
+                <text x="20" y="172" font-family="IBM Plex Sans, sans-serif" font-size="11.5" fill="currentColor" opacity="0.85">A window is 2.0 s long but the next one starts only 0.5 s later, so windows are four times longer</text>
+                <text x="20" y="188" font-family="IBM Plex Sans, sans-serif" font-size="11.5" fill="currentColor" opacity="0.85">than the step between them. That redundancy is deliberate: stage 4 averages the four opinions</text>
+                <text x="20" y="204" font-family="IBM Plex Sans, sans-serif" font-size="11.5" fill="currentColor" opacity="0.85">covering each moment into a single decision.</text>
+
+                <line x1="70" y1="228" x2="620" y2="228" stroke="currentColor" stroke-width="1" opacity="0.35"></line>
+                <text x="70" y="222" font-family="IBM Plex Mono, monospace" font-size="10" fill="currentColor" opacity="0.6">0 s</text>
+                <text x="190" y="222" font-family="IBM Plex Mono, monospace" font-size="10" fill="currentColor" opacity="0.6">2 s</text>
+                <text x="310" y="222" font-family="IBM Plex Mono, monospace" font-size="10" fill="currentColor" opacity="0.6">4 s</text>
+                <text x="430" y="222" font-family="IBM Plex Mono, monospace" font-size="10" fill="currentColor" opacity="0.6">6 s</text>
+
+                <rect x="70" y="236" width="120" height="9" rx="2" fill="#2a78d6" opacity="0.75"></rect>
+                <rect x="100" y="250" width="120" height="9" rx="2" fill="#2a78d6" opacity="0.66"></rect>
+                <rect x="130" y="264" width="120" height="9" rx="2" fill="#2a78d6" opacity="0.57"></rect>
+                <rect x="160" y="278" width="120" height="9" rx="2" fill="#2a78d6" opacity="0.48"></rect>
+                <rect x="190" y="292" width="120" height="9" rx="2" fill="#2a78d6" opacity="0.39"></rect>
+
+                <line x1="175" y1="230" x2="175" y2="316" stroke="#c25219" stroke-width="1.5" stroke-dasharray="3 3"></line>
+                <circle cx="175" cy="240" r="2.6" fill="#c25219"></circle>
+                <circle cx="175" cy="254" r="2.6" fill="#c25219"></circle>
+                <circle cx="175" cy="268" r="2.6" fill="#c25219"></circle>
+                <circle cx="175" cy="282" r="2.6" fill="#c25219"></circle>
+                <text x="186" y="330" font-family="IBM Plex Sans, sans-serif" font-size="11.5" font-weight="600" fill="#c25219">this instant is inside 4 windows</text>
+                <text x="470" y="264" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="currentColor" opacity="0.7">each bar = one 2.0 s window</text>
+                <text x="470" y="280" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="currentColor" opacity="0.7">offset 0.5 s from the last</text>
+              </svg>
+            </div>
+            <figcaption>
+              The conditioning chain, then the reason for 75% overlap. Note the ordering:
+              resampling comes first so the filter is designed once, at one rate, for every
+              recording.
+            </figcaption>
+          </figure>
         </div>
       </article>
 
@@ -563,6 +729,60 @@
             worthless — it scores below chance. The separation comes from harmonics: a sharp
             spike puts energy well above its own rhythm, and a smooth oscillation cannot.
           </p>
+
+          <figure class="detail">
+            <div class="scroller">
+              <svg viewBox="0 0 660 350" role="img"
+                   aria-label="Each window is reduced to 21 features in five groups, then scored by a gradient-boosted classifier. An ablation bar chart shows morphology features matter most, costing 0.033 event F1 when removed, while spectral and artifact features contribute nothing and slightly help when dropped.">
+                <text x="20" y="24" font-family="Archivo, sans-serif" font-size="14" font-weight="600" fill="currentColor">21 numbers per window &mdash; and what each family is actually worth</text>
+                <text x="20" y="46" font-family="IBM Plex Sans, sans-serif" font-size="11.5" fill="currentColor" opacity="0.8">Bars show the event F1 lost when that group is removed, measured over all 8 folds. Longer to the right = harder to do without.</text>
+
+                <line x1="470" y1="66" x2="470" y2="256" stroke="currentColor" stroke-width="1" opacity="0.4"></line>
+                <text x="470" y="78" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9.5" fill="currentColor" opacity="0.55">0</text>
+
+                <rect x="20" y="80" width="200" height="26" rx="4" fill="var(--surface-2)" stroke="currentColor" stroke-width="1" opacity="0.85"></rect>
+                <text x="30" y="98" font-family="IBM Plex Mono, monospace" font-size="11" font-weight="600" fill="#2a78d6" opacity="1">morphology</text>
+                <text x="126" y="98" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="currentColor" opacity="0.6">3 features</text>
+                <text x="232" y="98" font-family="IBM Plex Sans, sans-serif" font-size="10.5" fill="currentColor" opacity="0.7">line length, variance, kurtosis</text>
+                <rect x="470" y="87" width="99" height="12" rx="2" fill="#2a78d6" opacity="0.75"></rect>
+                <text x="575" y="97" text-anchor="start" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="currentColor" opacity="0.8">-0.033</text>
+                <rect x="20" y="114" width="200" height="26" rx="4" fill="var(--surface-2)" stroke="currentColor" stroke-width="1" opacity="0.85"></rect>
+                <text x="30" y="132" font-family="IBM Plex Mono, monospace" font-size="11" font-weight="600" fill="#2a78d6" opacity="1">rhythmicity</text>
+                <text x="126" y="132" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="currentColor" opacity="0.6">2 features</text>
+                <text x="232" y="132" font-family="IBM Plex Sans, sans-serif" font-size="10.5" fill="currentColor" opacity="0.7">autocorrelation peak and lag</text>
+                <rect x="470" y="121" width="54" height="12" rx="2" fill="#2a78d6" opacity="0.75"></rect>
+                <text x="530" y="131" text-anchor="start" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="currentColor" opacity="0.8">-0.018</text>
+                <rect x="20" y="148" width="200" height="26" rx="4" fill="var(--surface-2)" stroke="currentColor" stroke-width="1" opacity="0.85"></rect>
+                <text x="30" y="166" font-family="IBM Plex Mono, monospace" font-size="11" font-weight="600" fill="#2a78d6" opacity="1">wavelet</text>
+                <text x="126" y="166" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="currentColor" opacity="0.6">6 features</text>
+                <text x="232" y="166" font-family="IBM Plex Sans, sans-serif" font-size="10.5" fill="currentColor" opacity="0.7">db4 energies, 5 bands + entropy</text>
+                <rect x="470" y="155" width="27" height="12" rx="2" fill="#2a78d6" opacity="0.75"></rect>
+                <text x="503" y="165" text-anchor="start" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="currentColor" opacity="0.8">-0.009</text>
+                <rect x="20" y="182" width="200" height="26" rx="4" fill="var(--surface-2)" stroke="currentColor" stroke-width="1" opacity="0.85"></rect>
+                <text x="30" y="200" font-family="IBM Plex Mono, monospace" font-size="11" font-weight="600" fill="currentColor" opacity="0.7">spectral</text>
+                <text x="126" y="200" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="currentColor" opacity="0.6">8 features</text>
+                <text x="232" y="200" font-family="IBM Plex Sans, sans-serif" font-size="10.5" fill="currentColor" opacity="0.7">band powers, entropy, peak freq</text>
+                <rect x="461" y="189" width="9" height="12" rx="2" fill="currentColor" opacity="0.3"></rect>
+                <text x="455" y="199" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="currentColor" opacity="0.8">+0.003</text>
+                <rect x="20" y="216" width="200" height="26" rx="4" fill="var(--surface-2)" stroke="currentColor" stroke-width="1" opacity="0.85"></rect>
+                <text x="30" y="234" font-family="IBM Plex Mono, monospace" font-size="11" font-weight="600" fill="currentColor" opacity="0.7">artifact</text>
+                <text x="126" y="234" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="currentColor" opacity="0.6">2 features</text>
+                <text x="232" y="234" font-family="IBM Plex Sans, sans-serif" font-size="10.5" fill="currentColor" opacity="0.7">clipping, amplitude range</text>
+                <rect x="455" y="223" width="15" height="12" rx="2" fill="currentColor" opacity="0.3"></rect>
+                <text x="449" y="233" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="currentColor" opacity="0.8">+0.005</text>
+
+                <text x="20" y="286" font-family="IBM Plex Sans, sans-serif" font-size="11.5" fill="currentColor" opacity="0.85"><tspan font-weight="600">This inverts the source specification</tspan>, which leads with spectral band power. Shape-in-time beats</text>
+                <text x="20" y="302" font-family="IBM Plex Sans, sans-serif" font-size="11.5" fill="currentColor" opacity="0.85">frequency content here, most likely because the wavelet group already carries the frequency</text>
+                <text x="20" y="318" font-family="IBM Plex Sans, sans-serif" font-size="11.5" fill="currentColor" opacity="0.85">information with better time localisation, leaving the Welch-based features redundant.</text>
+                <text x="20" y="340" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="currentColor" opacity="0.6">Output: one probability per window. Not a yes/no &mdash; stage 4 needs something graded.</text>
+              </svg>
+            </div>
+            <figcaption>
+              The feature families with their measured contribution. The two groups that
+              score positive are not merely useless; removing them slightly improves the
+              result, which is what redundant inputs do to a tree ensemble.
+            </figcaption>
+          </figure>
         </div>
       </article>
 
