@@ -103,30 +103,54 @@ train and test have identical bandwidth despite different acquisition filters.
   measurable. Document as an explicit departure from the source specification.
 - Choose the common resample rate (400 Hz is the floor set by the test split).
 
-## Phase 1 baseline (recorded, do not lose)
+## Results (recorded, do not lose)
 
-Leave-one-animal-out over the 8 training mice, 40 recordings, thresholds fixed at 0.60/0.30.
+Leave-one-animal-out over the 8 training mice, 40 recordings.
 
-| metric | value |
-|---|---|
-| event F1 | **0.504 ± 0.192** |
-| event sensitivity | 0.980 |
-| event precision | 0.365 |
-| false alarms / hour | 44.6 |
-| window AUPRC | 0.712 |
+| | Phase 1 (untuned) | Phase 2 (tuned) |
+|---|---|---|
+| event F1 | 0.504 ± 0.192 | **0.791 ± 0.125** |
+| event sensitivity | 0.980 | 0.798 |
+| event precision | 0.365 | 0.834 |
+| false alarms / hour | 44.6 | **4.18** |
+| Cohen's κ | — | 0.624 |
+| burden bias (events/h) | +43.9 | **+0.6** |
+| burden correlation | 0.08 | **0.759** |
 
-**Threshold alone moves event F1 from 0.504 to 0.796 and false alarms from 44.6/h to
-3.45/h, with an unchanged model** (operating curve in `artifacts/phase1/`). This is the
-project's central claim, measured: the classifier is not the bottleneck. Do not tune
-CatBoost before the operating point and post-processing are right.
+**Operational point at ≤2 false alarms/hour:** threshold 0.80/0.65, sensitivity 0.716,
+precision 0.888.
 
-Known Phase 2 work items, in priority order:
-1. **Threshold/calibration.** `auto_class_weights="Balanced"` distorts the class prior, so
-   predicted probabilities are not calibrated and 0.60/0.30 sits far too permissive.
-2. **Burden is badly biased** — predicted 66.9 events/h vs true 23.0, correlation 0.08.
-   Burden agreement is a headline deliverable and is currently the weakest result.
-3. **`train_M2` is the hardest animal** (event F1 0.194, window AUPRC 0.619). It is also
-   the lowest-burden animal at 1.1-1.6% positive, so the model has least signal there.
+**Window AUPRC barely moved (0.712 → 0.721) while event F1 rose 0.29.** The entire gain
+came from calibration and threshold selection, not from the classifier. This is the
+project's central claim, measured twice. Do not tune CatBoost.
+
+### Ablations (leave one feature group out, event F1 vs 0.791 full)
+
+| group removed | F1 | delta |
+|---|---|---|
+| spectral | 0.793 | **+0.003** |
+| artifact | 0.796 | **+0.005** |
+| wavelet | 0.781 | −0.009 |
+| rhythmicity | 0.772 | −0.018 |
+| morphology | 0.757 | **−0.033** |
+
+**Morphology (line length, variance, kurtosis) carries the most; spectral and artifact
+features are dead weight.** Removing either slightly *helps*. That inverts the source
+specification, which leads with spectral band power. Likely because the wavelet group
+already encodes the frequency information with better time localisation, making the
+Welch-based features redundant. Do not delete them before confirming this holds with
+wavelets also removed.
+
+### Still open
+
+- `train_M3` runs at 13.9 FA/h against a cohort mean of 4.2 -- its fold chose a
+  permissive 0.40/0.25 threshold. Per-animal threshold sensitivity is the largest
+  remaining source of variance.
+- `train_M5` has the weakest classifier (window AUPRC 0.527) yet reaches F1 0.781, another
+  sign that post-processing dominates.
+- Sample-level F1 is 0.633, well below the published 0.90 (which is sample-level on the
+  official test split with a U-Net). Not comparable yet: different split, different task
+  framing. Phase 3 should run the official test split for a like-for-like number.
 
 ## Phases
 
