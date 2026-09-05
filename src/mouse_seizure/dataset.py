@@ -97,3 +97,33 @@ def label_windows(label_fraction: np.ndarray, threshold: float = 0.5) -> np.ndar
     boundaries the post-processing then has to recover.
     """
     return (label_fraction >= threshold).astype(np.int8)
+
+
+SIGNAL_CACHE_DIR = project_root() / "data" / "interim" / "signal"
+
+
+def cached_signal(
+    path: str | Path, *, rebuild: bool = False
+) -> tuple[np.ndarray, np.ndarray]:
+    """Preprocessed waveform and per-sample labels, memory-mapped.
+
+    The U-Net consumes the signal itself rather than the feature table, and 962
+    hours at 400 Hz is ~5 GB. Caching as float32 ``.npy`` and opening with
+    ``mmap_mode`` lets a training loop sample random segments from any recording
+    without holding the cohort in RAM.
+    """
+    path = Path(path)
+    SIGNAL_CACHE_DIR.mkdir(parents=True, exist_ok=True)
+    sig_path = SIGNAL_CACHE_DIR / f"{path.stem}_x.npy"
+    lab_path = SIGNAL_CACHE_DIR / f"{path.stem}_y.npy"
+
+    if rebuild or not (sig_path.exists() and lab_path.exists()):
+        rec = load_recording(path)
+        x, y = prepare(rec)
+        np.save(sig_path, x.astype(np.float32))
+        np.save(lab_path, y.astype(np.uint8))
+
+    return (
+        np.load(sig_path, mmap_mode="r"),
+        np.load(lab_path, mmap_mode="r"),
+    )
