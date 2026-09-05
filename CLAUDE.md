@@ -134,12 +134,36 @@ project's central claim, measured twice. Do not tune CatBoost.
 | rhythmicity | 0.772 | −0.018 |
 | morphology | 0.757 | **−0.033** |
 
-**Morphology (line length, variance, kurtosis) carries the most; spectral and artifact
-features are dead weight.** Removing either slightly *helps*. That inverts the source
-specification, which leads with spectral band power. Likely because the wavelet group
-already encodes the frequency information with better time localisation, making the
-Welch-based features redundant. Do not delete them before confirming this holds with
-wavelets also removed.
+**Morphology carries the most.** That inverts the source specification, which leads with
+spectral band power.
+
+Mean deltas are misleading at this scale -- fold-to-fold spread is 0.125, far larger than
+most of these effects. Paired Wilcoxon over the 40 recordings (uncorrected; Bonferroni at
+8 tests would be 0.006):
+
+| removed | features | F1 | mean delta | paired p |
+|---|---|---|---|---|
+| morphology | 18 | 0.757 | −0.033 | **0.001** |
+| rhythmicity | 19 | 0.772 | −0.018 | **0.001** |
+| spectral+artifact | 11 | 0.786 | −0.005 | **0.002** |
+| spectral+wavelet | 7 | 0.766 | −0.025 | 0.405 |
+| wavelet | 15 | 0.781 | −0.009 | 0.563 |
+| wavelet+artifact | 13 | 0.784 | −0.007 | 0.646 |
+| spectral | 13 | 0.793 | +0.003 | 0.289 |
+| artifact | 19 | 0.796 | +0.005 | 0.383 |
+
+**Only morphology and rhythmicity are clearly load-bearing.** Everything else sits inside
+the noise on a paired test, including the large-looking spectral+wavelet drop.
+
+**The spectral/wavelet redundancy hypothesis is NOT confirmed.** Additive prediction for
+removing both was −0.007; observed was −0.025, about 3.5x worse, which is the signature of
+redundancy -- but at p=0.405 that is not distinguishable from zero. A handful of recordings
+drive it. Record it as suggestive, not established, and do not repeat it as a finding.
+
+**Frozen feature set: 19 -- the artifact group is dropped.** Its removal is the best
+measured mean (0.796) though within noise, and the honest reading is that amplitude-only
+artifact features cannot do the job the specification assigns to an EMG channel we do not
+have.
 
 ### Still open
 
