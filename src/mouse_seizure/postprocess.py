@@ -144,3 +144,30 @@ def detect(
     smoothed = smooth(trace, fs, smooth_s)
     mask = hysteresis_threshold(smoothed, high, low)
     return form_events(mask, fs), trace
+
+
+DECISION_FS = 40.0
+"""Rate at which the probability trace is built and thresholded.
+
+The trace only changes once per 0.5 s stride, so representing it at the 400 Hz
+signal rate is ~200x redundant and makes the median filter dominate runtime.
+40 Hz gives 25 ms resolution on event boundaries -- twenty times finer than the
+0.5 s scoring tolerance -- at a fraction of the cost. Event times come out in
+seconds either way, so nothing downstream changes.
+"""
+
+
+def detect_events(
+    window_probs: np.ndarray,
+    duration_s: float,
+    high: float = 0.6,
+    low: float = 0.3,
+    decision_fs: float = DECISION_FS,
+    smooth_s: float = 0.5,
+) -> np.ndarray:
+    """Full chain at the decision rate; returns events as second offsets."""
+    n = int(round(duration_s * decision_fs))
+    trace = probability_trace(window_probs, n, decision_fs)
+    smoothed = smooth(trace, decision_fs, smooth_s)
+    mask = hysteresis_threshold(smoothed, high, low)
+    return form_events(mask, decision_fs)

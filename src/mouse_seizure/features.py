@@ -19,6 +19,7 @@ per window, because a 24-hour recording is millions of windows.
 from __future__ import annotations
 
 import numpy as np
+import pywt
 from scipy import signal as sps
 
 from mouse_seizure.config import TARGET_FS
@@ -31,6 +32,13 @@ BANDS: dict[str, tuple[float, float]] = {
     "high": (30.0, 100.0),
 }
 
+WAVELET = "db4"
+WAVELET_LEVEL = 5
+"""Daubechies-4, 5 levels. At 400 Hz the detail bands land near 100-200, 50-100,
+25-50, 12-25 and 6-12 Hz, so the SWD fundamental and its first harmonics fall in
+separate bands. db4 is short and asymmetric, which suits a transient spike better
+than a smooth symmetric wavelet."""
+
 FEATURE_NAMES: list[str] = [
     *(f"rel_{b}" for b in BANDS),
     "harmonic_ratio",
@@ -41,7 +49,28 @@ FEATURE_NAMES: list[str] = [
     "kurtosis",
     "autocorr_peak",
     "autocorr_lag_hz",
+    *(f"wavelet_l{i}" for i in range(1, WAVELET_LEVEL + 1)),
+    "wavelet_entropy",
+    "clip_fraction",
+    "amplitude_range",
 ]
+
+FEATURE_GROUPS: dict[str, list[str]] = {
+    "spectral": [
+        *(f"rel_{b}" for b in BANDS),
+        "harmonic_ratio",
+        "spectral_entropy",
+        "peak_freq",
+    ],
+    "wavelet": [
+        *(f"wavelet_l{i}" for i in range(1, WAVELET_LEVEL + 1)),
+        "wavelet_entropy",
+    ],
+    "morphology": ["log_line_length", "log_variance", "kurtosis"],
+    "rhythmicity": ["autocorr_peak", "autocorr_lag_hz"],
+    "artifact": ["clip_fraction", "amplitude_range"],
+}
+"""Feature families, used for ablations. Every name in FEATURE_NAMES appears once."""
 
 
 def _band_powers(freqs: np.ndarray, psd: np.ndarray) -> dict[str, np.ndarray]:
@@ -76,6 +105,38 @@ def _autocorrelation(windows: np.ndarray, fs: float) -> tuple[np.ndarray, np.nda
     return peak, lag_hz
 
 
+def _wavelet_energies(windows: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+    """Relative energy in each wavelet detail band, plus the entropy across bands.
+
+    A discrete wavelet transform localises energy in time as well as frequency, so
+    a brief sharp spike concentrates into a few coefficients rather than smearing
+    across the spectrum the way it does in a plain FFT.
+    """
+    coeffs = pywt.wavedec(windows, WAVELET, level=WAVELET_LEVEL, axis=1)
+    # coeffs[0] is the approximation; the details run coarse -> fine after it.
+    energies = np.column_stack([(c**2).sum(axis=1) for c in coeffs[1:]])
+    total = energies.sum(axis=1, keepdims=True) + 1e-12
+    relative = energies / total
+    entropy = -(relative * np.log(relative + 1e-12)).sum(axis=1) / np.log(
+        relative.shape[1]
+    )
+    return relative, entropy
+
+
+def _artifact_indicators(windows: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+    """Cheap saturation and excursion measures.
+
+    The specification gates artifact on an EMG channel; this recording has none
+    (see project_brief.md section 4.1), so these amplitude heuristics are all that
+    is available. They flag movement and chewing artifact, the dominant
+    false-positive source, only indirectly.
+    """
+    peak = np.abs(windows).max(axis=1, keepdims=True)
+    clip_fraction = (np.abs(windows) >= 0.98 * peak).mean(axis=1)
+    amplitude_range = windows.max(axis=1) - windows.min(axis=1)
+    return clip_fraction, amplitude_range
+
+
 def compute(windows: np.ndarray, fs: float = TARGET_FS) -> np.ndarray:
     """Feature matrix ``(n_windows, len(FEATURE_NAMES))`` for framed signal."""
     if len(windows) == 0:
@@ -101,6 +162,8 @@ def compute(windows: np.ndarray, fs: float = TARGET_FS) -> np.ndarray:
     kurtosis = (centred**4).mean(axis=1) / (variance**2 + 1e-12)
 
     ac_peak, ac_lag = _autocorrelation(windows, fs)
+    wavelet_rel, wavelet_entropy = _wavelet_energies(windows)
+    clip_fraction, amplitude_range = _artifact_indicators(windows)
 
     return np.column_stack(
         [
@@ -113,5 +176,9 @@ def compute(windows: np.ndarray, fs: float = TARGET_FS) -> np.ndarray:
             kurtosis,
             ac_peak,
             ac_lag,
+            wavelet_rel,
+            wavelet_entropy,
+            clip_fraction,
+            amplitude_range,
         ]
     ).astype(np.float32)
