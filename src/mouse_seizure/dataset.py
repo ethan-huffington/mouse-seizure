@@ -15,6 +15,7 @@ import numpy as np
 import polars as pl
 
 from mouse_seizure import features
+from mouse_seizure.causal import causal_bandpass
 from mouse_seizure.config import STRIDE_S, TARGET_FS, WINDOW_S, project_root
 from mouse_seizure.io import Recording, load_recording
 from mouse_seizure.preprocess import (
@@ -27,20 +28,28 @@ from mouse_seizure.preprocess import (
 )
 
 CACHE_DIR = project_root() / "data" / "interim" / "features"
+CAUSAL_CACHE_DIR = project_root() / "data" / "interim" / "features_causal"
 NON_OVERLAP_STEP = int(round(WINDOW_S / STRIDE_S))
 
 
-def prepare(rec: Recording) -> tuple[np.ndarray, np.ndarray]:
-    """Resample, filter and standardise one recording to the common rate."""
-    x = zscore(bandpass(resample_to(rec.ecog, rec.fs), TARGET_FS))
-    y = resample_labels(rec.labels, rec.fs)
-    return x, y
+def prepare(rec: Recording, *, causal: bool = False) -> tuple[np.ndarray, np.ndarray]:
+    """Resample, filter and standardise one recording to the common rate.
+
+    With ``causal=True`` the zero-phase filter is replaced by a forward-only one.
+    That changes the signal, so causal features must be recomputed rather than
+    reused: training on zero-phase data and predicting on causally filtered data
+    would introduce a domain shift we would then misread as the cost of going
+    real-time.
+    """
+    resampled = resample_to(rec.ecog, rec.fs)
+    filtered = causal_bandpass(resampled) if causal else bandpass(resampled, TARGET_FS)
+    return zscore(filtered), resample_labels(rec.labels, rec.fs)
 
 
-def build(path: str | Path) -> pl.DataFrame:
+def build(path: str | Path, *, causal: bool = False) -> pl.DataFrame:
     """Feature table for one recording, one row per window at the inference stride."""
     rec = load_recording(path)
-    x, y = prepare(rec)
+    x, y = prepare(rec, causal=causal)
     windows = frame(x, TARGET_FS)
     matrix = features.compute(windows, TARGET_FS)
     overlap = frame_labels(y, TARGET_FS)
@@ -59,14 +68,17 @@ def build(path: str | Path) -> pl.DataFrame:
     )
 
 
-def cached(path: str | Path, *, rebuild: bool = False) -> pl.DataFrame:
+def cached(
+    path: str | Path, *, rebuild: bool = False, causal: bool = False
+) -> pl.DataFrame:
     """Feature table for one recording, computed once and reused thereafter."""
     path = Path(path)
-    CACHE_DIR.mkdir(parents=True, exist_ok=True)
-    target = CACHE_DIR / f"{path.stem}.parquet"
+    directory = CAUSAL_CACHE_DIR if causal else CACHE_DIR
+    directory.mkdir(parents=True, exist_ok=True)
+    target = directory / f"{path.stem}.parquet"
     if target.exists() and not rebuild:
         return pl.read_parquet(target)
-    table = build(path)
+    table = build(path, causal=causal)
     table.write_parquet(target)
     return table
 

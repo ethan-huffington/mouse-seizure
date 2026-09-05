@@ -138,3 +138,20 @@ def burden(events: np.ndarray, n_samples: int, fs: float = TARGET_FS) -> Burden:
         total_swd_s=total,
         hours=hours,
     )
+
+
+def onset_latency(reference: np.ndarray, hypothesis: np.ndarray) -> np.ndarray:
+    """Signed onset error in seconds for each matched reference event.
+
+    Positive means the detection arrived late. Only reference events with an
+    overlapping detection contribute -- a miss has no latency, and scoring it as
+    zero or infinity would both distort the distribution.
+    """
+    if len(reference) == 0 or len(hypothesis) == 0:
+        return np.empty(0)
+    out = []
+    for start, end in reference:
+        overlapping = hypothesis[(hypothesis[:, 0] < end) & (hypothesis[:, 1] > start)]
+        if len(overlapping):
+            out.append(overlapping[:, 0].min() - start)
+    return np.array(out)
