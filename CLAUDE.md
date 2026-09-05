@@ -212,6 +212,40 @@ numbers differ.
 **Hardware note:** Apple M4, 10-core GPU, 17 GB unified, Metal 4. PyTorch MPS is available,
 so the U-Net does not need cloud compute.
 
+## Phase 3 -- U-Net vs feature pipeline (recorded)
+
+1.9M-parameter 1-D residual U-Net, per-sample output, no windowing and no overlap-add.
+Same folds, same animals, same post-processing and scoring code. 2500 steps/fold on MPS,
+~7 min/fold.
+
+| metric | features | U-Net | delta | paired p |
+|---|---|---|---|---|
+| event F1 | 0.796 | 0.823 | +0.028 | 0.242 (**within noise**) |
+| event sensitivity | 0.805 | 0.963 | +0.158 | <0.0001 |
+| event precision | 0.828 | 0.737 | −0.091 | <0.0001 |
+| false alarms / hour | 4.31 | 8.21 | +3.90 | <0.0001 |
+| sample F1 | 0.639 | 0.763 | +0.124 | <0.0001 |
+| burden bias (events/h) | +0.6 | +8.0 | | |
+| burden correlation | 0.759 | 0.862 | | |
+
+**The headline is that the two metrics disagree, and that is the whole point.**
+
+- **At sample level the U-Net wins decisively** (+0.124, p<0.0001). Expected and
+  architecturally meaningful: dense per-sample segmentation localises boundaries better
+  than window classification followed by post-hoc reconstruction.
+- **At event level it does not win** (p=0.242). Per animal it is 4 better / 4 worse.
+  Better boundaries do not translate into better event *counting*; the gain is spent
+  trading precision for sensitivity.
+- **For the actual deliverable it is worse.** Burden bias goes +0.6 -> +8.0 because it
+  raises twice the false alarms, even though burden correlation improves.
+
+So which architecture "wins" depends entirely on which metric is the headline -- which is
+the same argument this project has been making since Phase 1. Do not report the U-Net as
+better without saying at what.
+
+Threshold instability is worse for the U-Net: 6 of 8 folds chose 0.95/0.80, but two chose
+0.50/0.35 and 0.30/0.15.
+
 ## Phases
 
 0. **Data gate** (now) — verify montage, sampling rate, label format; plot real SWDs. EDA notebook.
