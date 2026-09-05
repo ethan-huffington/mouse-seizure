@@ -246,6 +246,62 @@ better without saying at what.
 Threshold instability is worse for the U-Net: 6 of 8 folds chose 0.95/0.80, but two chose
 0.50/0.35 and 0.30/0.15.
 
+## Phase 3 -- OFFICIAL TEST SPLIT (spent; one evaluation, do not repeat casually)
+
+10 unseen mice. Both models trained on all 8 training animals; thresholds fixed at the
+median of the 8 LOAO folds (features 0.55/0.40, U-Net 0.95/0.80) before running. Trailing
+truncated event dropped. Burden deliberately not reported (crop artefact).
+
+| metric | features | U-Net | published AugUNet1D |
+|---|---|---|---|
+| event F1 | 0.622 ± 0.159 | **0.912 ± 0.033** | not reported |
+| event sensitivity | 0.949 | 0.992 | — |
+| event precision | 0.485 | 0.847 | — |
+| false alarms / hour | **36.3** | 5.4 | — |
+| sample F1 | 0.668 | **0.890** | ~0.90 |
+| sample precision / recall | 0.551 / 0.910 | **0.838 / 0.955** | 0.91 / 0.90 |
+| Cohen's κ | 0.650 | 0.885 | — |
+
+Twin Peaks baseline (published, sample-level): precision 0.67 / recall 0.81.
+
+**Our U-Net is competitive with the published benchmark** (0.838/0.955 vs 0.91/0.90 --
+lower precision, higher recall) and clearly beats Twin Peaks, from 2500 training steps.
+
+**The feature pipeline collapsed: LOAO 0.796 -> test 0.622, false alarms 4.3/h -> 36.3/h.**
+Sensitivity held at 0.949, so it still *finds* seizures; precision fell to 0.485. This is
+a transfer failure, not a detection failure.
+
+### Diagnosis (measured, not speculated)
+
+Baseline-window feature distributions, train vs test, in training standard deviations:
+
+| feature | train mean | test mean | shift |
+|---|---|---|---|
+| harmonic_ratio | 0.271 | 3.896 | **+16.6 SD** |
+| rel_high (30-100 Hz) | 0.018 | 0.147 | **+8.2 SD** |
+| wavelet_l4 | 0.010 | 0.090 | **+7.6 SD** |
+
+Median shift across all 19 features: 0.93 SD. **The test domain sits outside the training
+distribution**, concentrated in the high-frequency features.
+
+Cause: training data was acquired at 1000 Hz (oversampled, clean 30-100 Hz band) and
+decimated; test data was acquired natively at 400 Hz, where a weaker acquisition-side
+anti-alias filter folds >200 Hz content down into 30-100 Hz. **The common 1-100 Hz
+band-pass we apply does not fix this** -- it equalises bandwidth, but aliasing that
+happened in the amplifier cannot be undone afterwards.
+
+The U-Net was robust to the same shift, presumably because it learned from low-frequency
+waveform morphology rather than high-frequency band ratios.
+
+**This is the project's most interesting result: hand-crafted spectral features were more
+brittle to an acquisition change than learned representations.** It also validates the
+warning recorded in `project_brief.md` that the official split confounds animal, session
+and hardware.
+
+**Untested fix:** low-pass both splits to ~30 Hz, below the contaminated band, and drop
+`harmonic_ratio`/`rel_high`. Plausible but UNVALIDATED -- testing it means a second look at
+a spent split.
+
 ## Phases
 
 0. **Data gate** (now) — verify montage, sampling rate, label format; plot real SWDs. EDA notebook.
