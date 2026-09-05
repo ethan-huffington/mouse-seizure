@@ -1,0 +1,647 @@
+<title>Mouse Seizure Pipeline</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+
+<style>
+  :root {
+    color-scheme: light;
+    --bg:         #fbfcfd;
+    --surface:    #f1f5f9;
+    --surface-2:  #e7edf4;
+    --ink:        #0f151c;
+    --ink-2:      #495868;
+    --ink-3:      #78889a;
+    --rule:       #d9e2ec;
+    --signal:     #2a78d6;
+    --signal-dim: #2a78d61f;
+    --ember:      #c25219;
+    --ember-dim:  #c252191c;
+    --shadow:     0 1px 2px #0f151c0a, 0 8px 24px #0f151c0a;
+
+    --display: "Archivo", "Helvetica Neue", Arial, sans-serif;
+    --body: "IBM Plex Sans", system-ui, -apple-system, sans-serif;
+    --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --bg:         #0d1218;
+      --surface:    #151d26;
+      --surface-2:  #1d2732;
+      --ink:        #eaf1f8;
+      --ink-2:      #a5b4c3;
+      --ink-3:      #71818f;
+      --rule:       #253039;
+      --signal:     #4f9cf0;
+      --signal-dim: #4f9cf026;
+      --ember:      #e8794a;
+      --ember-dim:  #e8794a22;
+      --shadow:     0 1px 2px #0000004d, 0 10px 28px #00000040;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg:         #0d1218;
+    --surface:    #151d26;
+    --surface-2:  #1d2732;
+    --ink:        #eaf1f8;
+    --ink-2:      #a5b4c3;
+    --ink-3:      #71818f;
+    --rule:       #253039;
+    --signal:     #4f9cf0;
+    --signal-dim: #4f9cf026;
+    --ember:      #e8794a;
+    --ember-dim:  #e8794a22;
+    --shadow:     0 1px 2px #0000004d, 0 10px 28px #00000040;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--body);
+    font-size: 16px;
+    line-height: 1.6;
+    margin: 0;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap {
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 4rem 1.5rem 6rem;
+    display: flex;
+    flex-direction: column;
+    gap: 4rem;
+  }
+
+  /* ---- masthead ---- */
+  .masthead { display: flex; flex-direction: column; gap: 1.25rem; }
+
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+
+  h1 {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: clamp(2.1rem, 5.5vw, 3.1rem);
+    line-height: 1.05;
+    letter-spacing: -0.025em;
+    margin: 0;
+    text-wrap: balance;
+  }
+
+  .standfirst {
+    font-size: 1.08rem;
+    color: var(--ink-2);
+    max-width: 62ch;
+    margin: 0;
+  }
+
+  .facts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 2.25rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid var(--rule);
+    margin-top: 0.5rem;
+  }
+  .fact { display: flex; flex-direction: column; padding-top: 0.85rem; }
+  .fact dt {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+  .fact dd {
+    margin: 0.15rem 0 0;
+    font-family: var(--mono);
+    font-size: 0.95rem;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ---- sections ---- */
+  section { display: flex; flex-direction: column; gap: 1.5rem; }
+
+  h2 {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: 1.45rem;
+    letter-spacing: -0.015em;
+    margin: 0;
+    text-wrap: balance;
+  }
+
+  .lede { color: var(--ink-2); max-width: 66ch; margin: 0; }
+
+  /* ---- figure ---- */
+  figure {
+    margin: 0;
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 10px;
+    padding: 2rem 1.25rem 1.25rem;
+    box-shadow: var(--shadow);
+  }
+  .scroller { overflow-x: auto; }
+  figure svg { display: block; max-width: 100%; height: auto; margin: 0 auto; color: var(--ink-2); }
+  figcaption {
+    font-size: 0.86rem;
+    color: var(--ink-3);
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--rule);
+    max-width: 70ch;
+  }
+
+  /* ---- stage cards ---- */
+  .stages { display: flex; flex-direction: column; gap: 1rem; }
+
+  .stage {
+    display: grid;
+    grid-template-columns: 3.25rem 1fr;
+    gap: 0 1.25rem;
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 10px;
+    padding: 1.5rem;
+  }
+  .stage.keystone { border-color: var(--signal); background: var(--signal-dim); }
+
+  .stage-num {
+    font-family: var(--mono);
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--ink-3);
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+  .stage.keystone .stage-num { color: var(--signal); }
+
+  .stage-body { display: flex; flex-direction: column; gap: 0.9rem; min-width: 0; }
+
+  .stage h3 {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: 1.18rem;
+    letter-spacing: -0.01em;
+    margin: 0;
+  }
+  .goal { margin: 0; color: var(--ink-2); max-width: 64ch; }
+
+  .io { display: flex; flex-wrap: wrap; gap: 0.5rem 0.75rem; }
+  .chip {
+    font-family: var(--mono);
+    font-size: 0.76rem;
+    padding: 0.28rem 0.6rem;
+    border-radius: 5px;
+    background: var(--surface-2);
+    color: var(--ink-2);
+    border: 1px solid var(--rule);
+    white-space: nowrap;
+  }
+  .chip b { color: var(--ink-3); font-weight: 500; }
+
+  .pivot {
+    margin: 0;
+    padding: 0.85rem 1rem;
+    border-left: 2px solid var(--ember);
+    background: var(--ember-dim);
+    border-radius: 0 6px 6px 0;
+    font-size: 0.93rem;
+    color: var(--ink-2);
+    max-width: 70ch;
+  }
+  .pivot b { color: var(--ink); font-weight: 600; }
+
+  .pending {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+
+  /* ---- status ---- */
+  .phases { display: flex; flex-direction: column; gap: 0.5rem; }
+  .phase {
+    display: grid;
+    grid-template-columns: 6.5rem 1fr auto;
+    gap: 1rem;
+    align-items: baseline;
+    padding: 0.8rem 1rem;
+    border: 1px solid var(--rule);
+    border-radius: 8px;
+    background: var(--surface);
+  }
+  .phase-name { font-family: var(--mono); font-size: 0.8rem; color: var(--ink-3); }
+  .phase-what { font-size: 0.94rem; color: var(--ink-2); }
+  .state {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    white-space: nowrap;
+  }
+  .state.done { color: var(--signal); background: var(--signal-dim); }
+  .state.now  { color: var(--ember); background: var(--ember-dim); }
+  .state.next { color: var(--ink-3); background: var(--surface-2); }
+
+  code {
+    font-family: var(--mono);
+    font-size: 0.88em;
+    background: var(--surface-2);
+    padding: 0.1em 0.35em;
+    border-radius: 4px;
+  }
+
+  @media (max-width: 620px) {
+    .stage { grid-template-columns: 1fr; gap: 0.75rem; }
+    .phase { grid-template-columns: 1fr auto; }
+    .phase-name { grid-column: 1 / -1; }
+  }
+</style>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <p class="eyebrow">Project map &middot; 01</p>
+    <h1>How a voltage trace becomes a seizure count</h1>
+    <p class="standfirst">
+      The pipeline turns 962 hours of continuous mouse EEG into a list of seizures with
+      start and end times, and from that into the numbers a lab actually wants: how often
+      the animal seizes and for how long. The data changes form five times on the way.
+    </p>
+    <dl class="facts">
+      <div class="fact"><dt>Recordings</dt><dd>40 &middot; 8 mice</dd></div>
+      <div class="fact"><dt>Signal</dt><dd>962 h</dd></div>
+      <div class="fact"><dt>Annotated events</dt><dd>22,570</dd></div>
+      <div class="fact"><dt>Channels</dt><dd>1</dd></div>
+      <div class="fact"><dt>Target rhythm</dt><dd>5.9 Hz</dd></div>
+    </dl>
+  </header>
+
+  <section>
+    <h2>The end-to-end flow</h2>
+    <p class="lede">
+      Each arrow is labelled with what the data <em>is</em> at that point, not just that
+      something happened. Following those labels down the page is the fastest way to
+      understand the project: a continuous voltage trace becomes a matrix, then a
+      probability, then a list, then a statistic.
+    </p>
+
+    <figure>
+      <div class="scroller">
+        <svg viewBox="0 0 700 1215" role="img"
+             aria-label="Vertical flow: 50 raw MATLAB files enter, pass through five stages — acquire and audit, condition and window, featurize and classify, form events, evaluate and report — and leave as per-animal metrics and seizure burden. Stage four, form events, is highlighted as the stage that governs event-level performance.">
+          <defs>
+            <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5"
+                    markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="currentColor"></path>
+            </marker>
+            <marker id="ar-sig" viewBox="0 0 10 10" refX="9" refY="5"
+                    markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="#2a78d6"></path>
+            </marker>
+          </defs>
+
+          <!-- INPUT -->
+          <rect x="100" y="8" width="360" height="52" rx="6"
+                fill="none" stroke="currentColor" stroke-width="1"
+                stroke-dasharray="4 3" opacity="0.65"></rect>
+          <text x="280" y="30" text-anchor="middle" font-family="IBM Plex Mono, monospace"
+                font-size="12" font-weight="600" fill="currentColor">50 MATLAB v7.3 files &middot; 18 GB</text>
+          <text x="280" y="47" text-anchor="middle" font-family="IBM Plex Mono, monospace"
+                font-size="11" fill="currentColor" opacity="0.7">ecog + per-sample label + fs</text>
+
+          <line x1="280" y1="60" x2="280" y2="92" stroke="currentColor"
+                stroke-width="1.5" marker-end="url(#ar)"></line>
+
+          <!-- STAGE 1 -->
+          <rect x="100" y="94" width="360" height="96" rx="8"
+                fill="var(--surface-2)" stroke="currentColor" stroke-width="1" opacity="0.95"></rect>
+          <text x="120" y="122" font-family="IBM Plex Mono, monospace" font-size="13"
+                font-weight="600" fill="currentColor" opacity="0.55">1</text>
+          <text x="146" y="122" font-family="Archivo, sans-serif" font-size="15"
+                font-weight="600" fill="currentColor">Acquire &amp; audit</text>
+          <text x="120" y="144" font-family="IBM Plex Sans, sans-serif" font-size="12"
+                fill="currentColor" opacity="0.8">Read HDF5, key animals by filename,</text>
+          <text x="120" y="160" font-family="IBM Plex Sans, sans-serif" font-size="12"
+                fill="currentColor" opacity="0.8">catalogue every undocumented defect.</text>
+          <text x="120" y="178" font-family="IBM Plex Mono, monospace" font-size="10.5"
+                fill="currentColor" opacity="0.55">io.py &middot; audit_dataset.py</text>
+
+          <line x1="280" y1="190" x2="280" y2="238" stroke="currentColor"
+                stroke-width="1.5" marker-end="url(#ar)"></line>
+          <text x="478" y="210" font-family="IBM Plex Mono, monospace" font-size="11"
+                fill="currentColor">40 recordings, 962 h</text>
+          <text x="478" y="226" font-family="IBM Plex Mono, monospace" font-size="11"
+                fill="currentColor" opacity="0.6">1000 Hz train / 400 Hz test</text>
+
+          <!-- STAGE 2 -->
+          <rect x="100" y="240" width="360" height="96" rx="8"
+                fill="var(--surface-2)" stroke="currentColor" stroke-width="1" opacity="0.95"></rect>
+          <text x="120" y="268" font-family="IBM Plex Mono, monospace" font-size="13"
+                font-weight="600" fill="currentColor" opacity="0.55">2</text>
+          <text x="146" y="268" font-family="Archivo, sans-serif" font-size="15"
+                font-weight="600" fill="currentColor">Condition &amp; window</text>
+          <text x="120" y="290" font-family="IBM Plex Sans, sans-serif" font-size="12"
+                fill="currentColor" opacity="0.8">Resample to one rate, band-pass, z-score,</text>
+          <text x="120" y="306" font-family="IBM Plex Sans, sans-serif" font-size="12"
+                fill="currentColor" opacity="0.8">slice into overlapping 2-second windows.</text>
+          <text x="120" y="324" font-family="IBM Plex Mono, monospace" font-size="10.5"
+                fill="currentColor" opacity="0.55">preprocess.py</text>
+
+          <line x1="280" y1="336" x2="280" y2="384" stroke="currentColor"
+                stroke-width="1.5" marker-end="url(#ar)"></line>
+          <text x="478" y="356" font-family="IBM Plex Mono, monospace" font-size="11"
+                fill="currentColor">6.9M windows @ 400 Hz</text>
+          <text x="478" y="372" font-family="IBM Plex Mono, monospace" font-size="11"
+                fill="currentColor" opacity="0.6">2.0 s long, 0.5 s apart</text>
+
+          <!-- STAGE 3 -->
+          <rect x="100" y="386" width="360" height="96" rx="8"
+                fill="var(--surface-2)" stroke="currentColor" stroke-width="1" opacity="0.95"></rect>
+          <text x="120" y="414" font-family="IBM Plex Mono, monospace" font-size="13"
+                font-weight="600" fill="currentColor" opacity="0.55">3</text>
+          <text x="146" y="414" font-family="Archivo, sans-serif" font-size="15"
+                font-weight="600" fill="currentColor">Featurize &amp; classify</text>
+          <text x="120" y="436" font-family="IBM Plex Sans, sans-serif" font-size="12"
+                fill="currentColor" opacity="0.8">21 measurements per window, then a</text>
+          <text x="120" y="452" font-family="IBM Plex Sans, sans-serif" font-size="12"
+                fill="currentColor" opacity="0.8">gradient-boosted score for each one.</text>
+          <text x="120" y="470" font-family="IBM Plex Mono, monospace" font-size="10.5"
+                fill="currentColor" opacity="0.55">features.py &middot; CatBoost</text>
+
+          <line x1="280" y1="482" x2="280" y2="530" stroke="currentColor"
+                stroke-width="1.5" marker-end="url(#ar)"></line>
+          <text x="478" y="502" font-family="IBM Plex Mono, monospace" font-size="11"
+                fill="currentColor">P(seizure) per window</text>
+          <text x="478" y="518" font-family="IBM Plex Mono, monospace" font-size="11"
+                fill="currentColor" opacity="0.6">one number, 0 to 1</text>
+
+          <!-- STAGE 4 - keystone -->
+          <rect x="100" y="532" width="360" height="112" rx="8"
+                fill="#2a78d614" stroke="#2a78d6" stroke-width="1.75"></rect>
+          <text x="120" y="560" font-family="IBM Plex Mono, monospace" font-size="13"
+                font-weight="600" fill="#2a78d6">4</text>
+          <text x="146" y="560" font-family="Archivo, sans-serif" font-size="15"
+                font-weight="600" fill="#2a78d6">Form events</text>
+          <text x="120" y="582" font-family="IBM Plex Sans, sans-serif" font-size="12"
+                fill="currentColor" opacity="0.9">Average overlapping windows into one trace,</text>
+          <text x="120" y="598" font-family="IBM Plex Sans, sans-serif" font-size="12"
+                fill="currentColor" opacity="0.9">threshold it, merge gaps, drop fragments —</text>
+          <text x="120" y="614" font-family="IBM Plex Sans, sans-serif" font-size="12"
+                fill="currentColor" opacity="0.9">so each seizure is counted exactly once.</text>
+          <text x="120" y="632" font-family="IBM Plex Mono, monospace" font-size="10.5"
+                fill="currentColor" opacity="0.55">postprocess.py</text>
+
+          <line x1="280" y1="644" x2="280" y2="692" stroke="#2a78d6"
+                stroke-width="1.75" marker-end="url(#ar-sig)"></line>
+          <text x="478" y="664" font-family="IBM Plex Mono, monospace" font-size="11"
+                fill="currentColor">event list</text>
+          <text x="478" y="680" font-family="IBM Plex Mono, monospace" font-size="11"
+                fill="currentColor" opacity="0.6">(onset, offset) in seconds</text>
+
+          <!-- STAGE 5 -->
+          <rect x="100" y="694" width="360" height="96" rx="8"
+                fill="var(--surface-2)" stroke="currentColor" stroke-width="1" opacity="0.95"></rect>
+          <text x="120" y="722" font-family="IBM Plex Mono, monospace" font-size="13"
+                font-weight="600" fill="currentColor" opacity="0.55">5</text>
+          <text x="146" y="722" font-family="Archivo, sans-serif" font-size="15"
+                font-weight="600" fill="currentColor">Evaluate &amp; report</text>
+          <text x="120" y="744" font-family="IBM Plex Sans, sans-serif" font-size="12"
+                fill="currentColor" opacity="0.8">Match detected events to annotated ones,</text>
+          <text x="120" y="760" font-family="IBM Plex Sans, sans-serif" font-size="12"
+                fill="currentColor" opacity="0.8">then total them into seizure burden.</text>
+          <text x="120" y="778" font-family="IBM Plex Mono, monospace" font-size="10.5"
+                fill="currentColor" opacity="0.55">evaluate.py &middot; timescoring</text>
+
+          <line x1="280" y1="790" x2="280" y2="822" stroke="currentColor"
+                stroke-width="1.5" marker-end="url(#ar)"></line>
+
+          <!-- OUTPUT -->
+          <rect x="100" y="824" width="360" height="70" rx="6"
+                fill="none" stroke="currentColor" stroke-width="1" stroke-dasharray="4 3" opacity="0.65"></rect>
+          <text x="280" y="848" text-anchor="middle" font-family="IBM Plex Mono, monospace"
+                font-size="12" font-weight="600" fill="currentColor">events/hour &middot; % time in seizure</text>
+          <text x="280" y="866" text-anchor="middle" font-family="IBM Plex Mono, monospace"
+                font-size="11" fill="currentColor" opacity="0.7">duration spread &middot; per-animal comparison</text>
+          <text x="280" y="884" text-anchor="middle" font-family="IBM Plex Mono, monospace"
+                font-size="11" fill="currentColor" opacity="0.7">event F1 &middot; false alarms/hour</text>
+
+          <!-- validation rail -->
+          <line x1="70" y1="386" x2="70" y2="790" stroke="currentColor"
+                stroke-width="1" stroke-dasharray="3 4" opacity="0.5"></line>
+          <line x1="70" y1="386" x2="94" y2="386" stroke="currentColor" stroke-width="1" opacity="0.5"></line>
+          <line x1="70" y1="790" x2="94" y2="790" stroke="currentColor" stroke-width="1" opacity="0.5"></line>
+          <text x="62" y="600" text-anchor="middle" font-family="IBM Plex Mono, monospace"
+                font-size="10.5" fill="currentColor" opacity="0.65"
+                transform="rotate(-90 62 600)">leave one animal out &middot; 8 folds</text>
+
+          <!-- footnote band -->
+          <line x1="100" y1="930" x2="600" y2="930" stroke="currentColor" stroke-width="1" opacity="0.25"></line>
+          <text x="100" y="956" font-family="IBM Plex Sans, sans-serif" font-size="12"
+                font-weight="600" fill="currentColor">Where the difficulty actually sits</text>
+          <text x="100" y="980" font-family="IBM Plex Sans, sans-serif" font-size="12"
+                fill="currentColor" opacity="0.8">Stage 3 is already strong: two hand-computed numbers separate</text>
+          <text x="100" y="996" font-family="IBM Plex Sans, sans-serif" font-size="12"
+                fill="currentColor" opacity="0.8">seizure from background windows at 0.96 AUC.</text>
+          <text x="100" y="1020" font-family="IBM Plex Sans, sans-serif" font-size="12"
+                fill="currentColor" opacity="0.8">Stage 4 is where the result is won or lost. Holding the model</text>
+          <text x="100" y="1036" font-family="IBM Plex Sans, sans-serif" font-size="12"
+                fill="currentColor" opacity="0.8">fixed and moving one threshold took event F1 from</text>
+
+          <text x="100" y="1074" font-family="IBM Plex Mono, monospace" font-size="20"
+                font-weight="600" fill="currentColor" opacity="0.45">0.50</text>
+          <line x1="152" y1="1068" x2="188" y2="1068" stroke="#2a78d6"
+                stroke-width="1.75" marker-end="url(#ar-sig)"></line>
+          <text x="196" y="1074" font-family="IBM Plex Mono, monospace" font-size="20"
+                font-weight="600" fill="#2a78d6">0.80</text>
+          <text x="252" y="1074" font-family="IBM Plex Sans, sans-serif" font-size="12"
+                fill="currentColor" opacity="0.8">and false alarms from 44.6/h to 3.5/h.</text>
+
+          <text x="100" y="1112" font-family="IBM Plex Sans, sans-serif" font-size="12"
+                fill="currentColor" opacity="0.8">That is why the project spends its effort on signal understanding</text>
+          <text x="100" y="1128" font-family="IBM Plex Sans, sans-serif" font-size="12"
+                fill="currentColor" opacity="0.8">and event formation rather than on a bigger classifier.</text>
+
+          <text x="100" y="1170" font-family="IBM Plex Mono, monospace" font-size="10.5"
+                fill="currentColor" opacity="0.5">Every stage-4 parameter is derived from the annotation</text>
+          <text x="100" y="1186" font-family="IBM Plex Mono, monospace" font-size="10.5"
+                fill="currentColor" opacity="0.5">distribution: merge gaps below 0.5 s, discard events under 1.0 s.</text>
+        </svg>
+      </div>
+      <figcaption>
+        The five stages, with the shape of the data on every arrow. Stage 4 is drawn in the
+        signal colour because it, not the classifier, governs event-level performance —
+        a claim measured rather than assumed.
+      </figcaption>
+    </figure>
+  </section>
+
+  <section>
+    <h2>What each stage is for</h2>
+    <p class="lede">
+      One card per stage: the goal, what goes in and comes out, and the single thing that
+      makes that stage harder than it looks. Detail diagrams land here as we build them.
+    </p>
+
+    <div class="stages">
+
+      <article class="stage">
+        <div class="stage-num">1</div>
+        <div class="stage-body">
+          <h3>Acquire &amp; audit</h3>
+          <p class="goal">
+            Establish what is actually in the files. The dataset ships with a four-line
+            description and no documentation, so everything the loader relies on had to be
+            measured rather than read.
+          </p>
+          <div class="io">
+            <span class="chip"><b>in</b> &nbsp;50 <code>.mat</code> files, 18 GB</span>
+            <span class="chip"><b>out</b> &nbsp;verified recordings + animal keys</span>
+          </div>
+          <p class="pivot">
+            <b>Training files are 1000 Hz and test files 400 Hz</b>, which nothing documents.
+            Missed, it corrupts every later result silently — no error, just numbers that
+            look like a modelling failure. Four test files also claim the same animal ID, so
+            animals are keyed by filename instead.
+          </p>
+        </div>
+      </article>
+
+      <article class="stage">
+        <div class="stage-num">2</div>
+        <div class="stage-body">
+          <h3>Condition &amp; window</h3>
+          <p class="goal">
+            Put every recording on the same footing — one sampling rate, one frequency band,
+            one amplitude scale — then cut the continuous trace into the fixed-length pieces
+            a classifier can consume.
+          </p>
+          <div class="io">
+            <span class="chip"><b>in</b> &nbsp;continuous trace + labels</span>
+            <span class="chip"><b>out</b> &nbsp;2.0 s windows every 0.5 s</span>
+          </div>
+          <p class="pivot">
+            <b>Window length is a trade.</b> Too short and the spectrum cannot resolve the
+            5.9 Hz rhythm; too long and a brief seizure is diluted by surrounding baseline.
+            2 seconds sits inside a typical 5.6 s event while still resolving to about 0.5 Hz.
+          </p>
+        </div>
+      </article>
+
+      <article class="stage">
+        <div class="stage-num">3</div>
+        <div class="stage-body">
+          <h3>Featurize &amp; classify</h3>
+          <p class="goal">
+            Reduce each window to 21 numbers that describe its shape and rhythm, then score
+            how seizure-like it is. The score is a probability, not a yes-or-no, because
+            every later step needs something graded.
+          </p>
+          <div class="io">
+            <span class="chip"><b>in</b> &nbsp;window matrix</span>
+            <span class="chip"><b>out</b> &nbsp;P(seizure) per window</span>
+          </div>
+          <p class="pivot">
+            <b>Ordinary theta rhythm sits at the same frequency as the seizure.</b> Around a
+            quarter of normal windows peak in the same 5–7 Hz band, so frequency alone is
+            worthless — it scores below chance. The separation comes from harmonics: a sharp
+            spike puts energy well above its own rhythm, and a smooth oscillation cannot.
+          </p>
+        </div>
+      </article>
+
+      <article class="stage keystone">
+        <div class="stage-num">4</div>
+        <div class="stage-body">
+          <h3>Form events</h3>
+          <p class="goal">
+            Turn a stream of per-window scores into discrete seizures with a start and an
+            end. Overlapping windows are averaged into one trace per moment, thresholded with
+            a hysteresis rule, then grouped — brief dropouts merged, fragments discarded.
+          </p>
+          <div class="io">
+            <span class="chip"><b>in</b> &nbsp;P(seizure) per window</span>
+            <span class="chip"><b>out</b> &nbsp;(onset, offset) list</span>
+          </div>
+          <p class="pivot">
+            <b>This stage decides whether a seizure is counted once, three times, or not at
+            all.</b> It is where the result is won: with the classifier held fixed, moving one
+            threshold took event F1 from 0.50 to 0.80 and cut false alarms from 44.6/h to
+            3.5/h.
+          </p>
+        </div>
+      </article>
+
+      <article class="stage">
+        <div class="stage-num">5</div>
+        <div class="stage-body">
+          <h3>Evaluate &amp; report</h3>
+          <p class="goal">
+            Match detected events against the annotator's, and turn the surviving list into
+            seizure burden — the number a lab actually uses. Scoring is done with the
+            community reference implementation so results compare to published work.
+          </p>
+          <div class="io">
+            <span class="chip"><b>in</b> &nbsp;detected + annotated events</span>
+            <span class="chip"><b>out</b> &nbsp;per-animal metrics + burden</span>
+          </div>
+          <p class="pivot">
+            <b>The scoring library's defaults are built for human seizures</b> — a 30-second
+            tolerance around events that here last five. Left alone they inflate every number
+            without raising an error, so all five parameters are overridden at rodent scale in
+            one place that nothing can bypass.
+          </p>
+        </div>
+      </article>
+
+    </div>
+  </section>
+
+  <section>
+    <h2>Build order</h2>
+    <p class="lede">
+      The pipeline was built thin end-to-end first — a deliberately weak model carried all
+      the way through to event-level scoring — so that every later change had an honest
+      number to be measured against from day one.
+    </p>
+    <div class="phases">
+      <div class="phase">
+        <span class="phase-name">Phase 0</span>
+        <span class="phase-what">Verify the data, catalogue its defects, plot real seizures</span>
+        <span class="state done">Complete</span>
+      </div>
+      <div class="phase">
+        <span class="phase-name">Phase 1</span>
+        <span class="phase-what">Thin skeleton through the whole chain — first honest baseline</span>
+        <span class="state done">Complete</span>
+      </div>
+      <div class="phase">
+        <span class="phase-name">Phase 2</span>
+        <span class="phase-what">Calibration, threshold selection, full feature set, ablations</span>
+        <span class="state now">Running</span>
+      </div>
+      <div class="phase">
+        <span class="phase-name">Phase 3</span>
+        <span class="phase-what">Real-time causal variant and a learned model, same harness</span>
+        <span class="state next">Planned</span>
+      </div>
+    </div>
+  </section>
+
+</div>

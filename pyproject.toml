@@ -35,5 +35,6 @@ dev = [
     "jupyter-client>=8.10.0",
     "nbconvert>=7.17.1",
     "nbformat>=5.11.1",
+    "pydeps>=3.0.7",
     "pytest>=9.1.1",
 ]
