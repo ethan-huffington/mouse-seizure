@@ -176,6 +176,42 @@ have.
   official test split with a U-Net). Not comparable yet: different split, different task
   framing. Phase 3 should run the official test split for a like-for-like number.
 
+## Phase 3 -- causal / real-time variant (recorded)
+
+Same 19 features, same folds, same animals; the only change is that nothing may look
+forward. `sosfilt` instead of `sosfiltfilt`, trailing-window probabilities, and a
+persistence counter instead of median smoothing. Features are rebuilt from causally
+filtered signal (separate cache in `data/interim/features_causal`) -- reusing offline
+features would measure a domain shift, not the constraint.
+
+| | offline | causal | paired p |
+|---|---|---|---|
+| event F1 | 0.796 | 0.786 | 0.368 (within noise) |
+| event sensitivity | 0.805 | 0.836 | 0.451 (within noise) |
+| event precision | 0.828 | 0.797 | **0.003** |
+| false alarms / hour | 4.31 | 5.63 | **0.008** |
+
+**Going real-time costs almost nothing in F1.** The cost is specifically in precision and
+false-alarm rate, not in detection ability -- sensitivity actually rises. Do not report
+this as "no cost"; report it as "the cost lands on precision".
+
+**Two different latency numbers, do not conflate them:**
+
+- **Onset localisation error** (how accurate the reported boundary is): median 0.00 s,
+  IQR -0.50 to +1.00 s, p90 2.00 s over 18,441 matched events. Quantised to the 0.5 s
+  stride, so this is "within one step". Negative values are real: the detector sometimes
+  starts firing before the annotated onset.
+- **Declaration delay** (how long before the system *knows*, the number a closed-loop
+  device cares about): 1.0-3.0 s, median 1.8 s, set entirely by the persistence counter
+  N x 0.5 s.
+
+Onsets are reported where evidence began, not where the counter fired, so the declaration
+delay is carried separately rather than hidden inside the onset. That is why the two
+numbers differ.
+
+**Hardware note:** Apple M4, 10-core GPU, 17 GB unified, Metal 4. PyTorch MPS is available,
+so the U-Net does not need cloud compute.
+
 ## Phases
 
 0. **Data gate** (now) — verify montage, sampling rate, label format; plot real SWDs. EDA notebook.
