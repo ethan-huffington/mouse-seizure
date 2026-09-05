@@ -136,6 +136,18 @@ def pick_threshold(rows: list[dict]) -> tuple[float, float]:
 
 
 def run(columns: list[str], label: str, *, verbose: bool = True) -> pl.DataFrame:
+    """Leave-one-animal-out over the training mice, resumable.
+
+    A completed run is reloaded from its parquet rather than recomputed. Each
+    configuration costs ~9 minutes, so without this a single interruption throws
+    away the whole sweep.
+    """
+    done = ARTIFACTS / f"results_{label}.parquet"
+    if done.exists():
+        if verbose:
+            print(f"  [cached] {label}", flush=True)
+        return pl.read_parquet(done)
+
     by_mouse = load_by_mouse()
     mice = sorted(by_mouse)
     rows, curve_rows = [], []
