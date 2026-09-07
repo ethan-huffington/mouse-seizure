@@ -62,7 +62,7 @@ architecture predicts.
 
 At **event** level the same comparison is **not significant** (+0.028, p = 0.242; four
 animals better, four worse), and for seizure burden — the actual scientific deliverable —
-the U-Net is **worse**: bias +8.0 events/hour against the feature pipeline's +0.6, because
+the U-Net is **worse**: bias +8.0 events/hour against the feature pipeline's +0.8, because
 it raises nearly twice the false alarms.
 
 Reporting only sample-level F1, the metric the published paper leads with, would have
@@ -221,6 +221,7 @@ tests/               17 tests
 
 ## Limitations
 
+- **Burden agreement** on the frozen 19-feature set: bias +0.8 events/hour, r = 0.770.
 - **Eight training animals.** Leave-one-animal-out over n=8 has real fold-to-fold variance
   (±0.125 event F1); most ablation differences sit inside it, and are reported as such.
 - **Single-scorer labels**, so no inter-rater ceiling and no estimate of label noise.

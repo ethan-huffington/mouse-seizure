@@ -225,8 +225,8 @@ Same folds, same animals, same post-processing and scoring code. 2500 steps/fold
 | event precision | 0.828 | 0.737 | −0.091 | <0.0001 |
 | false alarms / hour | 4.31 | 8.21 | +3.90 | <0.0001 |
 | sample F1 | 0.639 | 0.763 | +0.124 | <0.0001 |
-| burden bias (events/h) | +0.6 | +8.0 | | |
-| burden correlation | 0.759 | 0.862 | | |
+| burden bias (events/h) | +0.8 | +8.0 | | |
+| burden correlation | 0.770 | 0.862 | | |
 
 **The headline is that the two metrics disagree, and that is the whole point.**
 
