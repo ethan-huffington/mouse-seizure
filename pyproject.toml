@@ -1,7 +1,7 @@
 [project]
 name = "mouse-seizure"
 version = "0.1.0"
-description = "Add your description here"
+description = "Spike-wave discharge detection in mouse EEG: feature engineering, event formation, and event-level evaluation"
 readme = "README.md"
 authors = [
     { name = "Ethan Huffington", email = "e.d.huffington@gmail.com" }

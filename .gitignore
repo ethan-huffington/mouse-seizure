@@ -35,3 +35,6 @@ lightning_logs/
 # Credentials / access notes — never commit
 data_source_login.md
 *.secret
+
+# CatBoost writes training logs beside the working directory
+catboost_info/
