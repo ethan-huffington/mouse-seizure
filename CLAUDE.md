@@ -309,7 +309,8 @@ a spent split.
    event formation, event-level metrics, and burden stats. Produces an honest baseline number
    on day one that every later change is measured against.
 2. **Make it good** — full feature set, artifact handling, post-processing tuning, ablations.
-3. **Comparison and writeup** — U-Net variant against the same evaluation harness; README.
+3. **Comparison and writeup** — *complete*. Causal variant, U-Net, official test split
+   (spent), README.
 
 ## Library spine
 
