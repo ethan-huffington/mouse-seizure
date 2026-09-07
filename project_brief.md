@@ -2,9 +2,10 @@
 
 **What this is.** A detector that finds spike-wave discharge (SWD) events in continuous
 mouse EEG and converts them into per-session seizure-burden statistics, replacing manual
-visual scoring. This document translates the source specification
-(`mouse seizure detection project.pdf`) into what will actually be built against the
-dataset we have, and records every point where the two diverge.
+visual scoring. This document translates the original project specification into what
+will actually be built against the dataset we have, and records every point where the
+two diverge. The specification itself is not redistributed here; every requirement it
+makes is quoted or paraphrased where it becomes relevant.
 
 Every parameter below is derived from measurements on the real data, not from the
 source PDF's assumptions. Where the two disagree, the measurement wins and the

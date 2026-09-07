@@ -120,7 +120,7 @@ deposits energy at 12/18/24 Hz where a smooth oscillation cannot: 10–25 Hz rel
 alone reaches AUC 0.91.
 
 See [`notebooks/01_eda.ipynb`](notebooks/01_eda.ipynb) for the full analysis, and
-[`docs/pipeline.html`](docs/pipeline.html) for stage-by-stage diagrams.
+`docs/pipeline.html` for stage-by-stage diagrams (a standalone page — open it locally; GitHub shows HTML as source).
 
 ## Pipeline
 
@@ -213,7 +213,7 @@ and was removed.
 src/mouse_seizure/   io, preprocess, features, postprocess, evaluate, causal, unet
 experiments/         audit, phase1–phase3 runners
 notebooks/01_eda.ipynb
-docs/pipeline.html   stage-by-stage diagrams
+docs/pipeline.html   stage-by-stage diagrams (open locally)
 tests/               17 tests
 ```
 
