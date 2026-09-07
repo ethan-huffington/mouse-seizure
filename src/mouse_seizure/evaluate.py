@@ -72,7 +72,7 @@ def score(
         hypothesis = hypothesis[::decimation]
         fs = fs / decimation
 
-    fs_int = int(round(fs))
+    fs_int = round(fs)
     ref = Annotation(reference.astype(bool), fs_int)
     hyp = Annotation(hypothesis.astype(bool), fs_int)
 

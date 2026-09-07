@@ -79,7 +79,7 @@ def duration_of(table: pl.DataFrame) -> float:
 
 
 def reference_events(table: pl.DataFrame) -> np.ndarray:
-    n = int(round(duration_of(table) * DECISION_FS))
+    n = round(duration_of(table) * DECISION_FS)
     trace = pp.probability_trace(table["label_fraction"].to_numpy(), n, DECISION_FS)
     return pp.form_events(trace > 0.5, DECISION_FS, merge_gap_s=0.0, min_duration_s=0.0)
 
@@ -87,7 +87,7 @@ def reference_events(table: pl.DataFrame) -> np.ndarray:
 def score_events(
     reference: np.ndarray, hypothesis: np.ndarray, duration: float
 ) -> evaluate.Scores:
-    n = int(round(duration * DECISION_FS))
+    n = round(duration * DECISION_FS)
     return evaluate.score(
         pp.events_to_mask(reference, n, DECISION_FS),
         pp.events_to_mask(hypothesis, n, DECISION_FS),

@@ -42,8 +42,8 @@ def probability_trace(
     Implemented as two cumulative sums (weighted total and coverage count) so the
     cost does not depend on the overlap factor.
     """
-    n_win = int(round(window_s * fs))
-    step = int(round(stride_s * fs))
+    n_win = round(window_s * fs)
+    step = round(stride_s * fs)
 
     total = np.zeros(n_samples + 1, dtype=np.float64)
     count = np.zeros(n_samples + 1, dtype=np.float64)
@@ -85,7 +85,7 @@ def smooth(
     trace: np.ndarray, fs: float = TARGET_FS, seconds: float = 0.5
 ) -> np.ndarray:
     """Median filter the probability trace to enforce temporal coherence."""
-    size = max(1, int(round(seconds * fs)) | 1)  # odd size
+    size = max(1, round(seconds * fs) | 1)  # odd size
     return ndimage.median_filter(trace, size=size, mode="nearest")
 
 
@@ -127,7 +127,7 @@ def events_to_mask(
     """Rasterise an event list back to a per-sample binary mask."""
     mask = np.zeros(n_samples, dtype=bool)
     for start, end in events:
-        mask[int(round(start * fs)) : int(round(end * fs))] = True
+        mask[round(start * fs) : round(end * fs)] = True
     return mask
 
 
@@ -166,7 +166,7 @@ def detect_events(
     smooth_s: float = 0.5,
 ) -> np.ndarray:
     """Full chain at the decision rate; returns events as second offsets."""
-    n = int(round(duration_s * decision_fs))
+    n = round(duration_s * decision_fs)
     trace = probability_trace(window_probs, n, decision_fs)
     smoothed = smooth(trace, decision_fs, smooth_s)
     mask = hysteresis_threshold(smoothed, high, low)

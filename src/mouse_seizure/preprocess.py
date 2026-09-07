@@ -38,7 +38,7 @@ def resample_labels(
     """
     if fs_in == fs_out:
         return y
-    n_out = int(round(len(y) * fs_out / fs_in))
+    n_out = round(len(y) * fs_out / fs_in)
     idx = (np.arange(n_out) * (fs_in / fs_out)).round().astype(int)
     return y[np.clip(idx, 0, len(y) - 1)]
 
@@ -83,8 +83,8 @@ def frame(
     Returns a strided view rather than a copy, so windowing a 24-hour recording
     at 75% overlap costs no extra memory.
     """
-    n = int(round(window_s * fs))
-    step = int(round(stride_s * fs))
+    n = round(window_s * fs)
+    step = round(stride_s * fs)
     if len(x) < n:
         return np.empty((0, n), dtype=x.dtype)
     return np.lib.stride_tricks.sliding_window_view(x, n)[::step]

@@ -29,7 +29,7 @@ from mouse_seizure.preprocess import (
 
 CACHE_DIR = project_root() / "data" / "interim" / "features"
 CAUSAL_CACHE_DIR = project_root() / "data" / "interim" / "features_causal"
-NON_OVERLAP_STEP = int(round(WINDOW_S / STRIDE_S))
+NON_OVERLAP_STEP = round(WINDOW_S / STRIDE_S)
 
 
 def prepare(rec: Recording, *, causal: bool = False) -> tuple[np.ndarray, np.ndarray]:
