@@ -231,6 +231,41 @@
   }
   figure.detail figcaption { margin-top: 1rem; padding-top: 0.75rem; font-size: 0.82rem; }
 
+  table.features {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.86rem;
+    margin-top: 0.25rem;
+  }
+  table.features th {
+    text-align: left;
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    font-weight: 500;
+    padding: 0.4rem 0.6rem 0.4rem 0;
+    border-bottom: 1px solid var(--rule);
+  }
+  table.features td {
+    padding: 0.5rem 0.6rem 0.5rem 0;
+    border-bottom: 1px solid var(--rule);
+    color: var(--ink-2);
+    vertical-align: top;
+  }
+  table.features td.name { font-family: var(--mono); font-size: 0.8rem; color: var(--ink); white-space: nowrap; }
+  table.features tr.group td {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--signal);
+    padding-top: 1rem;
+    border-bottom: none;
+  }
+  .tablewrap { overflow-x: auto; }
+
   .pending {
     font-family: var(--mono);
     font-size: 0.72rem;
@@ -730,6 +765,21 @@
             spike puts energy well above its own rhythm, and a smooth oscillation cannot.
           </p>
 
+          <div class="tablewrap">
+            <table class="features">
+              <thead><tr><th>feature</th><th>what it measures on the waveform</th></tr></thead>
+              <tbody>
+                <tr class="group"><td colspan="2">spectral &mdash; <span style="text-transform:none;letter-spacing:0;color:var(--ink-3)">8 features — how power is distributed across frequency</span></td></tr><tr><td class="name">rel_delta</td><td>Power in 1–4 Hz. High when the trace is a slow rolling wave — deep sleep.</td></tr><tr><td class="name">rel_fundamental</td><td>Power in 4–9 Hz. The seizure's repetition rate lives here. So does theta, which is why this feature alone is weak.</td></tr><tr><td class="name">rel_beta</td><td>Power in 9–14 Hz. Mostly the seizure's second harmonic.</td></tr><tr><td class="name">rel_harmonic</td><td>Power in 14–30 Hz. The energy a sharp spike deposits above its own rhythm. Theta, being smooth, has almost none.</td></tr><tr><td class="name">rel_high</td><td>Power in 30–100 Hz. Fast, non-rhythmic content: muscle activity, electrode noise.</td></tr><tr><td class="name">harmonic_ratio</td><td>rel_harmonic ÷ rel_fundamental. Literally “how spiky is this rhythm”, and the single strongest spectral feature.</td></tr><tr><td class="name">spectral_entropy</td><td>Is the spectrum concentrated in a few frequencies, or spread flat? Rhythmic activity is peaked; noise is flat.</td></tr><tr><td class="name">peak_freq</td><td>The single loudest frequency. Nearly useless on its own — seizure and theta land in the same place.</td></tr><tr class="group"><td colspan="2">wavelet &mdash; <span style="text-transform:none;letter-spacing:0;color:var(--ink-3)">6 features — the same frequency information, but localised in time</span></td></tr><tr><td class="name">wavelet_l1 … l5</td><td>Energy at five time-scales, coarse to fine. Unlike a spectrum computed over the whole window, a brief sharp event concentrates into a few coefficients instead of smearing across every frequency.</td></tr><tr><td class="name">wavelet_entropy</td><td>How spread out that energy is across scales. A single scale dominating means one clean rhythm.</td></tr><tr class="group"><td colspan="2">morphology &mdash; <span style="text-transform:none;letter-spacing:0;color:var(--ink-3)">3 features — the literal shape of the trace, no frequency involved</span></td></tr><tr><td class="name">log_line_length</td><td>Total up-and-down distance travelled. Imagine straightening the squiggle into a line and measuring it: spiky signals travel much further than smooth ones of the same height.</td></tr><tr><td class="name">log_variance</td><td>Amplitude. How far from flat the trace sits.</td></tr><tr><td class="name">kurtosis</td><td>How heavy the tails of the amplitude distribution are. Occasional big spikes against a quiet background produce heavy tails; a steady oscillation does not.</td></tr><tr class="group"><td colspan="2">rhythmicity &mdash; <span style="text-transform:none;letter-spacing:0;color:var(--ink-3)">2 features — how regularly the shape repeats</span></td></tr><tr><td class="name">autocorr_peak</td><td>Slide the window against a delayed copy of itself: how well does it match? A metronomic spike train matches strongly, irregular activity of the same power does not.</td></tr><tr><td class="name">autocorr_lag_hz</td><td>The delay at which that best match occurs, expressed as a rate. This is the repetition frequency measured in the time domain rather than the frequency domain.</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="pivot">
+            <b>The artifact group was removed.</b> Two amplitude heuristics (clipping fraction,
+            amplitude range) were built to stand in for the EMG-based artifact rejection the
+            specification assumes. They measured as dead weight &mdash; removing them slightly
+            <em>improved</em> the result &mdash; so the shipped set is 19 features, not 21.
+          </p>
+
           <figure class="detail">
             <div class="scroller">
               <svg viewBox="0 0 660 350" role="img"
@@ -943,6 +993,91 @@
         </div>
       </article>
 
+    </div>
+  </section>
+
+
+  <section>
+    <h2>How it was trained and validated</h2>
+    <p class="lede">
+      This is not a pipeline stage &mdash; no data is transformed here. It is the protocol
+      wrapped around stages 3 to 5, and it is what makes the numbers mean anything. Two
+      things are easy to conflate: <strong>cross-validation is the measuring procedure;
+      an ablation is an experiment that repeats that whole procedure</strong> with something
+      taken away.
+    </p>
+    <figure>
+      <div class="scroller">
+        <svg viewBox="0 0 660 470" role="img" aria-label="Eight leave-one-animal-out folds. In each fold one mouse is the test animal, a second rotating mouse is the validation animal used only to choose the decision threshold, and the remaining six are training data. Inside a fold: fit the model on six animals, sweep sixteen thresholds on the validation animal, apply the winner to the test animal. The whole eight-fold protocol is then repeated once per configuration.">
+  <text x="20" y="22" font-family="Archivo, sans-serif" font-size="14" font-weight="600" fill="currentColor">Eight folds. Every mouse is the test animal exactly once.</text>
+  <text x="20" y="42" font-family="IBM Plex Sans, sans-serif" font-size="11.5" fill="currentColor" opacity="0.8">Grey = trained on. The validation animal rotates too, so no single mouse shapes every threshold.</text>
+  <text x="86" y="92" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="10" fill="currentColor" opacity="0.7">fold 1</text><text x="86" y="118" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="10" fill="currentColor" opacity="0.7">fold 2</text><text x="86" y="144" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="10" fill="currentColor" opacity="0.7">fold 3</text><text x="86" y="170" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="10" fill="currentColor" opacity="0.7">fold 4</text><text x="86" y="196" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="10" fill="currentColor" opacity="0.7">fold 5</text><text x="86" y="222" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="10" fill="currentColor" opacity="0.7">fold 6</text><text x="86" y="248" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="10" fill="currentColor" opacity="0.7">fold 7</text><text x="86" y="274" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="10" fill="currentColor" opacity="0.7">fold 8</text><text x="119.0" y="70" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="currentColor" opacity="0.7">M1</text><text x="169.0" y="70" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="currentColor" opacity="0.7">M2</text><text x="219.0" y="70" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="currentColor" opacity="0.7">M3</text><text x="269.0" y="70" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="currentColor" opacity="0.7">M4</text><text x="319.0" y="70" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="currentColor" opacity="0.7">M5</text><text x="369.0" y="70" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="currentColor" opacity="0.7">M6</text><text x="419.0" y="70" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="currentColor" opacity="0.7">M8</text><text x="469.0" y="70" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="currentColor" opacity="0.7">M9</text>
+  <rect x="96" y="78" width="46" height="20" rx="3" fill="#2a78d6" opacity="0.85"></rect><text x="119.0" y="92" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9.5" font-weight="600" fill="#ffffff">test</text><rect x="146" y="78" width="46" height="20" rx="3" fill="#c25219" opacity="0.85"></rect><text x="169.0" y="92" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9.5" font-weight="600" fill="#ffffff">val</text><rect x="196" y="78" width="46" height="20" rx="3" fill="currentColor" opacity="0.13"></rect><rect x="246" y="78" width="46" height="20" rx="3" fill="currentColor" opacity="0.13"></rect><rect x="296" y="78" width="46" height="20" rx="3" fill="currentColor" opacity="0.13"></rect><rect x="346" y="78" width="46" height="20" rx="3" fill="currentColor" opacity="0.13"></rect><rect x="396" y="78" width="46" height="20" rx="3" fill="currentColor" opacity="0.13"></rect><rect x="446" y="78" width="46" height="20" rx="3" fill="currentColor" opacity="0.13"></rect><rect x="96" y="104" width="46" height="20" rx="3" fill="currentColor" opacity="0.13"></rect><rect x="146" y="104" width="46" height="20" rx="3" fill="#2a78d6" opacity="0.85"></rect><text x="169.0" y="118" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9.5" font-weight="600" fill="#ffffff">test</text><rect x="196" y="104" width="46" height="20" rx="3" fill="#c25219" opacity="0.85"></rect><text x="219.0" y="118" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9.5" font-weight="600" fill="#ffffff">val</text><rect x="246" y="104" width="46" height="20" rx="3" fill="currentColor" opacity="0.13"></rect><rect x="296" y="104" width="46" height="20" rx="3" fill="currentColor" opacity="0.13"></rect><rect x="346" y="104" width="46" height="20" rx="3" fill="currentColor" opacity="0.13"></rect><rect x="396" y="104" width="46" height="20" rx="3" fill="currentColor" opacity="0.13"></rect><rect x="446" y="104" width="46" height="20" rx="3" fill="currentColor" opacity="0.13"></rect><rect x="96" y="130" width="46" height="20" rx="3" fill="currentColor" opacity="0.13"></rect><rect x="146" y="130" width="46" height="20" rx="3" fill="currentColor" opacity="0.13"></rect><rect x="196" y="130" width="46" height="20" rx="3" fill="#2a78d6" opacity="0.85"></rect><text x="219.0" y="144" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9.5" font-weight="600" fill="#ffffff">test</text><rect x="246" y="130" width="46" height="20" rx="3" fill="#c25219" opacity="0.85"></rect><text x="269.0" y="144" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9.5" font-weight="600" fill="#ffffff">val</text><rect x="296" y="130" width="46" height="20" rx="3" fill="currentColor" opacity="0.13"></rect><rect x="346" y="130" width="46" height="20" rx="3" fill="currentColor" opacity="0.13"></rect><rect x="396" y="130" width="46" height="20" rx="3" fill="currentColor" opacity="0.13"></rect><rect x="446" y="130" width="46" height="20" rx="3" fill="currentColor" opacity="0.13"></rect><rect x="96" y="156" width="46" height="20" rx="3" fill="currentColor" opacity="0.13"></rect><rect x="146" y="156" width="46" height="20" rx="3" fill="currentColor" opacity="0.13"></rect><rect x="196" y="156" width="46" height="20" rx="3" fill="currentColor" opacity="0.13"></rect><rect x="246" y="156" width="46" height="20" rx="3" fill="#2a78d6" opacity="0.85"></rect><text x="269.0" y="170" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9.5" font-weight="600" fill="#ffffff">test</text><rect x="296" y="156" width="46" height="20" rx="3" fill="#c25219" opacity="0.85"></rect><text x="319.0" y="170" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9.5" font-weight="600" fill="#ffffff">val</text><rect x="346" y="156" width="46" height="20" rx="3" fill="currentColor" opacity="0.13"></rect><rect x="396" y="156" width="46" height="20" rx="3" fill="currentColor" opacity="0.13"></rect><rect x="446" y="156" width="46" height="20" rx="3" fill="currentColor" opacity="0.13"></rect><rect x="96" y="182" width="46" height="20" rx="3" fill="currentColor" opacity="0.13"></rect><rect x="146" y="182" width="46" height="20" rx="3" fill="currentColor" opacity="0.13"></rect><rect x="196" y="182" width="46" height="20" rx="3" fill="currentColor" opacity="0.13"></rect><rect x="246" y="182" width="46" height="20" rx="3" fill="currentColor" opacity="0.13"></rect><rect x="296" y="182" width="46" height="20" rx="3" fill="#2a78d6" opacity="0.85"></rect><text x="319.0" y="196" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9.5" font-weight="600" fill="#ffffff">test</text><rect x="346" y="182" width="46" height="20" rx="3" fill="#c25219" opacity="0.85"></rect><text x="369.0" y="196" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9.5" font-weight="600" fill="#ffffff">val</text><rect x="396" y="182" width="46" height="20" rx="3" fill="currentColor" opacity="0.13"></rect><rect x="446" y="182" width="46" height="20" rx="3" fill="currentColor" opacity="0.13"></rect><rect x="96" y="208" width="46" height="20" rx="3" fill="currentColor" opacity="0.13"></rect><rect x="146" y="208" width="46" height="20" rx="3" fill="currentColor" opacity="0.13"></rect><rect x="196" y="208" width="46" height="20" rx="3" fill="currentColor" opacity="0.13"></rect><rect x="246" y="208" width="46" height="20" rx="3" fill="currentColor" opacity="0.13"></rect><rect x="296" y="208" width="46" height="20" rx="3" fill="currentColor" opacity="0.13"></rect><rect x="346" y="208" width="46" height="20" rx="3" fill="#2a78d6" opacity="0.85"></rect><text x="369.0" y="222" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9.5" font-weight="600" fill="#ffffff">test</text><rect x="396" y="208" width="46" height="20" rx="3" fill="#c25219" opacity="0.85"></rect><text x="419.0" y="222" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9.5" font-weight="600" fill="#ffffff">val</text><rect x="446" y="208" width="46" height="20" rx="3" fill="currentColor" opacity="0.13"></rect><rect x="96" y="234" width="46" height="20" rx="3" fill="currentColor" opacity="0.13"></rect><rect x="146" y="234" width="46" height="20" rx="3" fill="currentColor" opacity="0.13"></rect><rect x="196" y="234" width="46" height="20" rx="3" fill="currentColor" opacity="0.13"></rect><rect x="246" y="234" width="46" height="20" rx="3" fill="currentColor" opacity="0.13"></rect><rect x="296" y="234" width="46" height="20" rx="3" fill="currentColor" opacity="0.13"></rect><rect x="346" y="234" width="46" height="20" rx="3" fill="currentColor" opacity="0.13"></rect><rect x="396" y="234" width="46" height="20" rx="3" fill="#2a78d6" opacity="0.85"></rect><text x="419.0" y="248" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9.5" font-weight="600" fill="#ffffff">test</text><rect x="446" y="234" width="46" height="20" rx="3" fill="#c25219" opacity="0.85"></rect><text x="469.0" y="248" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9.5" font-weight="600" fill="#ffffff">val</text><rect x="96" y="260" width="46" height="20" rx="3" fill="#c25219" opacity="0.85"></rect><text x="119.0" y="274" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9.5" font-weight="600" fill="#ffffff">val</text><rect x="146" y="260" width="46" height="20" rx="3" fill="currentColor" opacity="0.13"></rect><rect x="196" y="260" width="46" height="20" rx="3" fill="currentColor" opacity="0.13"></rect><rect x="246" y="260" width="46" height="20" rx="3" fill="currentColor" opacity="0.13"></rect><rect x="296" y="260" width="46" height="20" rx="3" fill="currentColor" opacity="0.13"></rect><rect x="346" y="260" width="46" height="20" rx="3" fill="currentColor" opacity="0.13"></rect><rect x="396" y="260" width="46" height="20" rx="3" fill="currentColor" opacity="0.13"></rect><rect x="446" y="260" width="46" height="20" rx="3" fill="#2a78d6" opacity="0.85"></rect><text x="469.0" y="274" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9.5" font-weight="600" fill="#ffffff">test</text>
+
+  <line x1="20" y1="290" x2="640" y2="290" stroke="currentColor" stroke-width="1" opacity="0.25"></line>
+  <text x="20" y="316" font-family="Archivo, sans-serif" font-size="13" font-weight="600" fill="currentColor">What actually happens inside one fold</text>
+
+  <rect x="20" y="330" width="140" height="58" rx="6" fill="var(--surface-2)" stroke="currentColor" stroke-width="1" opacity="0.9"></rect>
+  <text x="30" y="349" font-family="IBM Plex Mono, monospace" font-size="10.5" font-weight="600" fill="currentColor">1 &middot; fit</text>
+  <text x="30" y="365" font-family="IBM Plex Sans, sans-serif" font-size="10.5" fill="currentColor" opacity="0.8">6 animals, ~720 h</text>
+  <text x="30" y="379" font-family="IBM Plex Sans, sans-serif" font-size="10.5" fill="currentColor" opacity="0.6">hyperparameters fixed</text>
+
+  <rect x="184" y="330" width="150" height="58" rx="6" fill="#c252191c" stroke="#c25219" stroke-width="1.4"></rect>
+  <text x="194" y="349" font-family="IBM Plex Mono, monospace" font-size="10.5" font-weight="600" fill="#c25219">2 &middot; choose threshold</text>
+  <text x="194" y="365" font-family="IBM Plex Sans, sans-serif" font-size="10.5" fill="currentColor" opacity="0.8">sweep 16 pairs on the</text>
+  <text x="194" y="379" font-family="IBM Plex Sans, sans-serif" font-size="10.5" fill="currentColor" opacity="0.8">validation animal only</text>
+
+  <rect x="358" y="330" width="150" height="58" rx="6" fill="#2a78d614" stroke="#2a78d6" stroke-width="1.4"></rect>
+  <text x="368" y="349" font-family="IBM Plex Mono, monospace" font-size="10.5" font-weight="600" fill="#2a78d6">3 &middot; measure</text>
+  <text x="368" y="365" font-family="IBM Plex Sans, sans-serif" font-size="10.5" fill="currentColor" opacity="0.8">apply that threshold to</text>
+  <text x="368" y="379" font-family="IBM Plex Sans, sans-serif" font-size="10.5" fill="currentColor" opacity="0.8">the test animal, record</text>
+
+  <line x1="160" y1="359" x2="182" y2="359" stroke="currentColor" stroke-width="1.5" marker-end="url(#ar)"></line>
+  <line x1="334" y1="359" x2="356" y2="359" stroke="currentColor" stroke-width="1.5" marker-end="url(#ar)"></line>
+
+  <text x="530" y="349" font-family="IBM Plex Sans, sans-serif" font-size="10.5" fill="currentColor" opacity="0.75">The only thing</text>
+  <text x="530" y="363" font-family="IBM Plex Sans, sans-serif" font-size="10.5" fill="currentColor" opacity="0.75">searched is the</text>
+  <text x="530" y="377" font-family="IBM Plex Sans, sans-serif" font-size="10.5" font-weight="600" fill="#c25219">threshold.</text>
+
+  <text x="20" y="424" font-family="IBM Plex Sans, sans-serif" font-size="11.5" fill="currentColor" opacity="0.85">The eight folds are one <tspan font-weight="600">run</tspan>. An ablation repeats the whole run with a feature group removed, so the feature study</text>
+  <text x="20" y="440" font-family="IBM Plex Sans, sans-serif" font-size="11.5" fill="currentColor" opacity="0.85">was 9 configurations x 8 folds = <tspan font-weight="600">72 model fits</tspan>. The U-Net was 8 more, trained separately and compared afterwards &mdash;</text>
+  <text x="20" y="456" font-family="IBM Plex Sans, sans-serif" font-size="11.5" fill="currentColor" opacity="0.85">never combined with the trees, never trained together. Two experiments sharing the same folds and the same scoring.</text>
+</svg>
+      </div>
+      <figcaption>
+        Leave-one-animal-out with nested threshold selection. Splitting by animal is not
+        optional here: windows from one recording are near-duplicates, so a random split
+        would put copies of the test data in training and report a number with no bearing
+        on a new mouse.
+      </figcaption>
+    </figure>
+    <div class="stages">
+      <article class="stage">
+        <div class="stage-num">?</div>
+        <div class="stage-body">
+          <h3>Three things people expect to be here, and are not</h3>
+          <p class="goal">
+            <strong>No hyperparameter search.</strong> CatBoost ran at 400 iterations, depth 6,
+            learning rate 0.1 for every experiment in the project. That was deliberate: the
+            Phase 1 result showed window-level quality barely moved while the event-level
+            result nearly doubled, so tuning the classifier would have been effort spent on
+            the part that was already good enough.
+          </p>
+          <p class="goal">
+            <strong>No joint training.</strong> The gradient-boosted model and the U-Net are
+            two separate experiments. The U-Net replaces stages 2 and 3 entirely &mdash; it reads
+            raw signal and emits one probability per sample, so it has no windows and no
+            features &mdash; and then runs through identical stage 4 and 5 code. That is what
+            makes the comparison about architecture rather than about scoring.
+          </p>
+          <p class="goal">
+            <strong>No tuning against the test split.</strong> The ten held-out mice were
+            evaluated exactly once, with both models trained on all eight training animals and
+            thresholds fixed beforehand at the median of the eight folds. A held-out number
+            you adjust and re-check is no longer held out.
+          </p>
+        </div>
+      </article>
     </div>
   </section>
 
