@@ -160,6 +160,13 @@ removing both was −0.007; observed was −0.025, about 3.5x worse, which is th
 redundancy -- but at p=0.405 that is not distinguishable from zero. A handful of recordings
 drive it. Record it as suggestive, not established, and do not repeat it as a finding.
 
+**Selection bias, state it when reporting.** The frozen set is the argmax over 9
+configurations scored on the same leave-one-animal-out data we report, so 0.796 is a
+selected maximum and slightly optimistic. The unselected number is the full 21-feature
+set at **0.791**. Selection bought +0.005, which the paired test called indistinguishable
+(p=0.383), and the spread across all 9 configurations is only 0.757-0.796. The test-split
+number is unaffected -- that configuration was fixed before the split was touched.
+
 **Frozen feature set: 19 -- the artifact group is dropped.** Its removal is the best
 measured mean (0.796) though within noise, and the honest reading is that amplitude-only
 artifact features cannot do the job the specification assigns to an EMG channel we do not

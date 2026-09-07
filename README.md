@@ -222,6 +222,10 @@ tests/               17 tests
 ## Limitations
 
 - **Burden agreement** on the frozen 19-feature set: bias +0.8 events/hour, r = 0.770.
+- **The frozen feature set is a selected maximum.** It is the best of nine configurations
+  scored on the same cross-validation data, so its 0.796 is mildly optimistic; the
+  unselected 21-feature set scores 0.791, and the difference was not distinguishable from
+  noise. The held-out test number is unaffected — that configuration was fixed first.
 - **Eight training animals.** Leave-one-animal-out over n=8 has real fold-to-fold variance
   (±0.125 event F1); most ablation differences sit inside it, and are reported as such.
 - **Single-scorer labels**, so no inter-rater ceiling and no estimate of label noise.
