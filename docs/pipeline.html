@@ -1067,8 +1067,81 @@
       wrapped around stages 3 to 5, and it is what makes the numbers mean anything. Two
       things are easy to conflate: <strong>cross-validation is the measuring procedure;
       an ablation is an experiment that repeats that whole procedure</strong> with something
-      taken away.
+      taken away. The first figure is the outer program &mdash; every experiment that ran, and
+      what each one decided. The second is what happens inside any single one of them.
     </p>
+    <figure>
+      <div class="scroller">
+        <svg viewBox="0 0 660 742" role="img" aria-label="The full experimental program as seven stages: exploratory single-feature AUC with no model, Phase 1 with a hardcoded threshold, Phase 2 with a searched threshold, 64 ablation fits, the causal variant, the U-Net, and finally the one-shot official test split. Ninety-eight model fits in total, each stage producing metrics that decided what the next stage did.">
+        <text x="20" y="24" font-family="Archivo, sans-serif" font-size="14" font-weight="600" fill="currentColor">The whole experimental program: 98 model fits, seven stages</text>
+        <text x="20" y="44" font-family="IBM Plex Sans, sans-serif" font-size="11.5" fill="currentColor" opacity="0.8">Each stage produced a measurement, and that measurement decided what the next stage did. Nothing was run speculatively.</text>
+        <text x="20" y="66" font-family="IBM Plex Mono, monospace" font-size="9" letter-spacing="0.08em" fill="currentColor" opacity="0.5">STAGE</text>
+        <text x="104" y="66" font-family="IBM Plex Mono, monospace" font-size="9" letter-spacing="0.08em" fill="currentColor" opacity="0.5">FITS</text>
+        <text x="150" y="66" font-family="IBM Plex Mono, monospace" font-size="9" letter-spacing="0.08em" fill="currentColor" opacity="0.5">WHAT RAN / WHAT CAME OUT</text>
+        <text x="24" y="90" font-family="Archivo, sans-serif" font-size="12.5" font-weight="600" fill="currentColor" opacity="0.45">EDA</text>
+        <rect x="100" y="78" width="34" height="17" rx="8" fill="currentColor" opacity="0.15"></rect>
+        <text x="117" y="90" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" font-weight="600" fill="currentColor" opacity="0.45">0</text>
+        <text x="150" y="89" font-family="IBM Plex Sans, sans-serif" font-size="11" fill="currentColor" opacity="0.85">single-feature ROC AUC, 1 recording</text>
+        <text x="150" y="107" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="currentColor" opacity="0.45">AUC 0.29 - 0.96 per candidate</text>
+        <text x="150" y="127" font-family="IBM Plex Sans, sans-serif" font-size="10.5" fill="currentColor" opacity="0.6">↳ decided: <tspan font-style="italic">which feature families to build</tspan></text>
+        <line x1="117" y1="100" x2="117" y2="154" stroke="currentColor" stroke-width="1" stroke-dasharray="2 3" opacity="0.35"></line>
+        <text x="24" y="174" font-family="Archivo, sans-serif" font-size="12.5" font-weight="600" fill="#2a78d6" opacity="1">Phase 1</text>
+        <rect x="100" y="162" width="34" height="17" rx="8" fill="#2a78d6" opacity="0.18"></rect>
+        <text x="117" y="174" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" font-weight="600" fill="#2a78d6" opacity="1">8</text>
+        <text x="150" y="173" font-family="IBM Plex Sans, sans-serif" font-size="11" fill="currentColor" opacity="0.85">13 features - threshold HARDCODED 0.60/0.30</text>
+        <text x="150" y="191" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="#2a78d6" opacity="1">event F1 0.504 - AUPRC 0.712 - 44.6 FA/h</text>
+        <text x="150" y="211" font-family="IBM Plex Sans, sans-serif" font-size="10.5" fill="currentColor" opacity="0.6">↳ decided: <tspan font-style="italic">calibration is broken; threshold must be searched</tspan></text>
+        <line x1="117" y1="184" x2="117" y2="238" stroke="currentColor" stroke-width="1" stroke-dasharray="2 3" opacity="0.35"></line>
+        <text x="24" y="258" font-family="Archivo, sans-serif" font-size="12.5" font-weight="600" fill="#2a78d6" opacity="1">Phase 2</text>
+        <rect x="100" y="246" width="34" height="17" rx="8" fill="#2a78d6" opacity="0.18"></rect>
+        <text x="117" y="258" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" font-weight="600" fill="#2a78d6" opacity="1">8</text>
+        <text x="150" y="257" font-family="IBM Plex Sans, sans-serif" font-size="11" fill="currentColor" opacity="0.85">21 features - threshold searched on a validation animal</text>
+        <text x="150" y="275" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="#2a78d6" opacity="1">event F1 0.791 - AUPRC 0.721 - 4.3 FA/h</text>
+        <text x="150" y="295" font-family="IBM Plex Sans, sans-serif" font-size="10.5" fill="currentColor" opacity="0.6">↳ decided: <tspan font-style="italic">this is the real baseline</tspan></text>
+        <line x1="117" y1="268" x2="117" y2="322" stroke="currentColor" stroke-width="1" stroke-dasharray="2 3" opacity="0.35"></line>
+        <text x="24" y="342" font-family="Archivo, sans-serif" font-size="12.5" font-weight="600" fill="#2a78d6" opacity="1">Ablations</text>
+        <rect x="100" y="330" width="34" height="17" rx="8" fill="#2a78d6" opacity="0.18"></rect>
+        <text x="117" y="342" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" font-weight="600" fill="#2a78d6" opacity="1">64</text>
+        <text x="150" y="341" font-family="IBM Plex Sans, sans-serif" font-size="11" fill="currentColor" opacity="0.85">8 configurations x 8 folds - whole families removed</text>
+        <text x="150" y="359" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="#2a78d6" opacity="1">F1 span 0.757-0.796 - paired Wilcoxon p</text>
+        <text x="150" y="379" font-family="IBM Plex Sans, sans-serif" font-size="10.5" fill="currentColor" opacity="0.6">↳ decided: <tspan font-style="italic">freeze 19 features (drop artifact group)</tspan></text>
+        <line x1="117" y1="352" x2="117" y2="406" stroke="currentColor" stroke-width="1" stroke-dasharray="2 3" opacity="0.35"></line>
+        <text x="24" y="426" font-family="Archivo, sans-serif" font-size="12.5" font-weight="600" fill="#2a78d6" opacity="1">Causal</text>
+        <rect x="100" y="414" width="34" height="17" rx="8" fill="#2a78d6" opacity="0.18"></rect>
+        <text x="117" y="426" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" font-weight="600" fill="#2a78d6" opacity="1">8</text>
+        <text x="150" y="425" font-family="IBM Plex Sans, sans-serif" font-size="11" fill="currentColor" opacity="0.85">features rebuilt causally - threshold AND persistence searched</text>
+        <text x="150" y="443" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="#2a78d6" opacity="1">event F1 0.786 - declaration delay 1.8 s</text>
+        <text x="150" y="463" font-family="IBM Plex Sans, sans-serif" font-size="10.5" fill="currentColor" opacity="0.6">↳ decided: <tspan font-style="italic">the cost of real-time lands on precision</tspan></text>
+        <line x1="117" y1="436" x2="117" y2="490" stroke="currentColor" stroke-width="1" stroke-dasharray="2 3" opacity="0.35"></line>
+        <text x="24" y="510" font-family="Archivo, sans-serif" font-size="12.5" font-weight="600" fill="#2a78d6" opacity="1">U-Net</text>
+        <rect x="100" y="498" width="34" height="17" rx="8" fill="#2a78d6" opacity="0.18"></rect>
+        <text x="117" y="510" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" font-weight="600" fill="#2a78d6" opacity="1">8</text>
+        <text x="150" y="509" font-family="IBM Plex Sans, sans-serif" font-size="11" fill="currentColor" opacity="0.85">raw signal, 2500 steps/fold - same stage 4 and 5 code</text>
+        <text x="150" y="527" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="#2a78d6" opacity="1">event F1 0.823 - sample F1 0.763</text>
+        <text x="150" y="547" font-family="IBM Plex Sans, sans-serif" font-size="10.5" fill="currentColor" opacity="0.6">↳ decided: <tspan font-style="italic">winner depends on which metric is the headline</tspan></text>
+        <line x1="117" y1="520" x2="117" y2="574" stroke="currentColor" stroke-width="1" stroke-dasharray="2 3" opacity="0.35"></line>
+        <rect x="16" y="574" width="628" height="74" rx="6" fill="#c2521914" stroke="#c25219" stroke-width="1.3"></rect>
+        <text x="24" y="594" font-family="Archivo, sans-serif" font-size="12.5" font-weight="600" fill="#c25219" opacity="1">TEST SPLIT</text>
+        <rect x="100" y="582" width="34" height="17" rx="8" fill="#c25219" opacity="0.18"></rect>
+        <text x="117" y="594" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" font-weight="600" fill="#c25219" opacity="1">2</text>
+        <text x="150" y="593" font-family="IBM Plex Sans, sans-serif" font-size="11" fill="currentColor" opacity="0.85">no folds - refit on all 8 - thresholds fixed beforehand</text>
+        <text x="150" y="611" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="#c25219" opacity="1">features 0.622 - U-Net 0.912</text>
+        <text x="150" y="631" font-family="IBM Plex Sans, sans-serif" font-size="10.5" fill="currentColor" opacity="0.6">↳ decided: <tspan font-style="italic">terminal: cannot be re-run</tspan></text>
+        <line x1="20" y1="668" x2="640" y2="668" stroke="currentColor" stroke-width="1" opacity="0.25"></line>
+        <text x="20" y="688" font-family="IBM Plex Sans, sans-serif" font-size="11.5" fill="currentColor" opacity="0.85">Every stage from Phase 1 onward used the same 8-fold leave-one-animal-out protocol. Only the final row did not:</text>
+        <text x="20" y="706" font-family="IBM Plex Sans, sans-serif" font-size="11.5" fill="currentColor" opacity="0.85">the test split <tspan font-weight="600">is</tspan> the held-out set, so both models were refit once on all eight animals with thresholds already fixed.</text>
+        <text x="20" y="730" font-family="IBM Plex Mono, monospace" font-size="10" fill="currentColor" opacity="0.55">Hyperparameters never varied: 400 iterations, depth 6, lr 0.1 — every fit above.</text>
+        </svg>
+      </div>
+      <figcaption>
+        The outer loop. Every stage below Phase 1 reuses the same eight folds; what changes
+        is which component is under test. The ablations are the only stage that varies the
+        model side, and they vary it by whole feature family rather than by individual
+        feature &mdash; so morphology is known to be load-bearing without knowing which of its
+        three features carries it.
+      </figcaption>
+    </figure>
+
     <figure>
       <div class="scroller">
         <svg viewBox="0 0 660 470" role="img" aria-label="Eight leave-one-animal-out folds. In each fold one mouse is the scored evaluation animal, a second rotating mouse is the validation animal used only to choose the decision threshold, and the remaining six are training data. Inside a fold: fit the model on six animals, sweep sixteen thresholds on the validation animal, apply the winner to the test animal. The whole eight-fold protocol is then repeated once per configuration.">
