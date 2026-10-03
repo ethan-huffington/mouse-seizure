@@ -765,6 +765,69 @@
             spike puts energy well above its own rhythm, and a smooth oscillation cannot.
           </p>
 
+          <figure class="detail">
+            <div class="scroller">
+                <svg viewBox="0 0 660 436" role="img" aria-label="The method for ranking candidate features before any model existed: window one recording, compute a power spectrum per window, reduce each window to one candidate number, then score that number against the window label with ROC AUC. Harmonic power reaches 0.913 while dominant frequency reaches only 0.534; on theta-like windows dominant frequency falls below chance to 0.424 while harmonic power holds at 0.910.">
+                <text x="20" y="22" font-family="Archivo, sans-serif" font-size="14" font-weight="600" fill="currentColor">Ranking candidate features before building any of them</text>
+                <text x="20" y="42" font-family="IBM Plex Sans, sans-serif" font-size="11.5" fill="currentColor" opacity="0.8">No classifier, no training, no folds. One number per window, scored directly against the label.</text>
+                <rect x="20" y="58" width="142" height="56" rx="6" fill="var(--surface-2)" stroke="currentColor" stroke-width="1" opacity="0.9"></rect>
+                <text x="31" y="78" font-family="IBM Plex Mono, monospace" font-size="10" font-weight="600" fill="currentColor">1 · one recording</text>
+                <text x="31" y="96" font-family="IBM Plex Sans, sans-serif" font-size="10" fill="currentColor" opacity="0.7">22.5 h, 162k windows</text>
+                <line x1="162" y1="86" x2="178" y2="86" stroke="currentColor" stroke-width="1.5" marker-end="url(#ar)"></line>
+                <rect x="180" y="58" width="142" height="56" rx="6" fill="var(--surface-2)" stroke="currentColor" stroke-width="1" opacity="0.9"></rect>
+                <text x="191" y="78" font-family="IBM Plex Mono, monospace" font-size="10" font-weight="600" fill="currentColor">2 · Welch PSD</text>
+                <text x="191" y="96" font-family="IBM Plex Sans, sans-serif" font-size="10" fill="currentColor" opacity="0.7">per 2 s window</text>
+                <line x1="322" y1="86" x2="338" y2="86" stroke="currentColor" stroke-width="1.5" marker-end="url(#ar)"></line>
+                <rect x="340" y="58" width="142" height="56" rx="6" fill="var(--surface-2)" stroke="currentColor" stroke-width="1" opacity="0.9"></rect>
+                <text x="351" y="78" font-family="IBM Plex Mono, monospace" font-size="10" font-weight="600" fill="currentColor">3 · one number</text>
+                <text x="351" y="96" font-family="IBM Plex Sans, sans-serif" font-size="10" fill="currentColor" opacity="0.7">e.g. 10-25 Hz power</text>
+                <line x1="482" y1="86" x2="498" y2="86" stroke="currentColor" stroke-width="1.5" marker-end="url(#ar)"></line>
+                <rect x="500" y="58" width="142" height="56" rx="6" fill="var(--surface-2)" stroke="currentColor" stroke-width="1" opacity="0.9"></rect>
+                <text x="511" y="78" font-family="IBM Plex Mono, monospace" font-size="10" font-weight="600" fill="currentColor">4 · roc_auc_score</text>
+                <text x="511" y="96" font-family="IBM Plex Sans, sans-serif" font-size="10" fill="currentColor" opacity="0.7">vs the window label</text>
+                <text x="20" y="146" font-family="IBM Plex Sans, sans-serif" font-size="11.5" font-weight="600" fill="currentColor">AUC = chance a random seizure window outscores a random baseline window</text>
+                <text x="392" y="170" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9.5" fill="currentColor" opacity="0.65">chance</text>
+                <line x1="392" y1="176" x2="392" y2="344" stroke="currentColor" stroke-width="1.2" stroke-dasharray="3 3" opacity="0.6"></line>
+                <text x="238" y="197" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="currentColor" opacity="0.85">fundamental x harmonics</text>
+                <rect x="392" y="186" width="219" height="15" rx="2" fill="#2a78d6" opacity="0.8"></rect>
+                <text x="617" y="198" text-anchor="start" font-family="IBM Plex Mono, monospace" font-size="11" font-weight="600" fill="#2a78d6">0.964</text>
+                <text x="238" y="228" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="currentColor" opacity="0.85">10-25 Hz harmonic power</text>
+                <rect x="392" y="217" width="195" height="15" rx="2" fill="#2a78d6" opacity="0.8"></rect>
+                <text x="593" y="229" text-anchor="start" font-family="IBM Plex Mono, monospace" font-size="11" font-weight="600" fill="#2a78d6">0.913</text>
+                <text x="238" y="259" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="currentColor" opacity="0.85">4-9 Hz band power</text>
+                <rect x="392" y="248" width="125" height="15" rx="2" fill="#2a78d6" opacity="0.8"></rect>
+                <text x="523" y="260" text-anchor="start" font-family="IBM Plex Mono, monospace" font-size="11" font-weight="600" fill="#2a78d6">0.765</text>
+                <text x="238" y="290" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="currentColor" opacity="0.85">dominant frequency</text>
+                <rect x="392" y="279" width="16" height="15" rx="2" fill="#c25219" opacity="0.8"></rect>
+                <text x="414" y="291" text-anchor="start" font-family="IBM Plex Mono, monospace" font-size="11" font-weight="600" fill="#c25219">0.534</text>
+                <text x="238" y="321" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="currentColor" opacity="0.85">1-4 Hz delta power</text>
+                <rect x="291" y="310" width="101" height="15" rx="2" fill="#c25219" opacity="0.8"></rect>
+                <text x="285" y="322" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="11" font-weight="600" fill="#c25219">0.287</text>
+                <text x="297" y="358" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9.5" fill="currentColor" opacity="0.45">0.3</text>
+                <text x="392" y="358" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9.5" fill="currentColor" opacity="0.45">0.5</text>
+                <text x="486" y="358" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9.5" fill="currentColor" opacity="0.45">0.7</text>
+                <text x="581" y="358" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9.5" fill="currentColor" opacity="0.45">0.9</text>
+                <line x1="20" y1="372" x2="640" y2="372" stroke="currentColor" stroke-width="1" opacity="0.25"></line>
+                <text x="20" y="392" font-family="IBM Plex Sans, sans-serif" font-size="11.5" font-weight="600" fill="currentColor">Then the same test against theta-like windows only — the actual confound</text>
+                <text x="20" y="412" font-family="IBM Plex Sans, sans-serif" font-size="11.5" fill="currentColor" opacity="0.85">dominant frequency <tspan font-family="IBM Plex Mono, monospace" fill="#c25219" font-weight="600">0.534 → 0.424</tspan> (below chance — theta sits <tspan font-style="italic">higher</tspan> than the seizure)</text>
+                <text x="20" y="430" font-family="IBM Plex Sans, sans-serif" font-size="11.5" fill="currentColor" opacity="0.85">harmonic power <tspan font-family="IBM Plex Mono, monospace" fill="#2a78d6" font-weight="600">0.913 → 0.910</tspan> — unmoved. That is the whole case for the feature set.</text>
+                </svg>
+            </div>
+            <figcaption>
+              How the feature families were chosen, before a single model was trained.
+              This came first; the ablation chart below it is the same question asked again
+              afterwards, with a model and all eight folds. The two agree that the
+              frequency-domain fundamental is weak on its own.
+            </figcaption>
+          </figure>
+          <p class="goal">
+            <strong>Worth knowing what this is not.</strong> These numbers come from one
+            recording, and were meant to decide what to build rather than to be a result.
+            A feature scoring 0.91 on its own is a reason to implement it, not evidence of
+            how the finished detector performs &mdash; that only arrives after event formation
+            and leave-one-animal-out.
+          </p>
+
           <div class="tablewrap">
             <table class="features">
               <thead><tr><th>feature</th><th>what it measures on the waveform</th></tr></thead>
