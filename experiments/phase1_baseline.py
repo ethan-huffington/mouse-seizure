@@ -8,6 +8,13 @@ event-level number exists, against which every later change is measured.
 Validation is leave-one-animal-out over the 8 training mice. The official test
 split is not touched until Phase 2 is finished.
 
+**The recorded baseline of event F1 0.504 is not reproducible by re-running this
+script.** It was measured when ``features.py`` exposed 13 features; the module has
+since grown to 21, and this script imports whatever ``FEATURE_NAMES`` currently
+holds. Re-running therefore scores a *different, larger* feature set at the same
+fixed threshold. The 0.504 figure is kept because every later number is quoted
+against it, not because this file regenerates it.
+
     uv run python experiments/phase1_baseline.py
     uv run python experiments/phase1_baseline.py --quick   # 2 folds, Day1 only
 """

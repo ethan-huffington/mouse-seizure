@@ -251,13 +251,9 @@ split's crop-at-100-seizures construction makes its rates an artifact (§2).
 
 ## 8. Scope and variants
 
-Core scope is **offline** detection, free to smooth bidirectionally. Two extensions, in
-priority order:
+Core scope is **offline** detection, free to smooth bidirectionally. One extension:
 
-1. **Causal real-time variant** — persistence counter instead of bidirectional smoothing,
-   with a latency budget. Small addition, and the form relevant to closed-loop
-   neurostimulation.
-2. **Dense 1-D U-Net** — per-sample segmentation with no windowing and no overlap-add,
+1. **Dense 1-D U-Net** — per-sample segmentation with no windowing and no overlap-add,
    evaluated through the identical harness. This is a genuine architectural comparison
    (hand-crafted + per-window vs. learned + per-sample), not a library swap. It is a
    comparison against the baseline, not a replacement for it.
@@ -288,7 +284,7 @@ data is single-channel.
    event-level baseline that every later change is measured against.
 2. **Make it good** — full feature set, artifact handling, post-processing tuning,
    feature-group ablations, calibration.
-3. **Comparison and writeup** — causal variant and U-Net through the same harness; README.
+3. **Comparison and writeup** — U-Net through the same harness; README.
 
 ## Library spine
 

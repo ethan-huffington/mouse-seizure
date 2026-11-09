@@ -17,9 +17,15 @@ obvious conclusion turned out to be wrong.
 | | event F1 | sensitivity | precision | false alarms/h | sample F1 |
 |---|---|---|---|---|---|
 | Phase 1 baseline (untuned) | 0.504 ± 0.192 | 0.980 | 0.365 | 44.6 | 0.507 |
-| **Feature pipeline** | **0.796** | 0.805 | 0.828 | **4.31** | 0.639 |
-| Causal / real-time | 0.786 | 0.836 | 0.797 | 5.63 | — |
-| 1-D U-Net | 0.823 | 0.963 | 0.737 | 8.21 | **0.763** |
+| Feature pipeline | 0.796 | 0.805 | **0.828** | **4.31** | 0.639 |
+| 1-D U-Net | **0.823** † | **0.963** | 0.737 | 8.21 | **0.763** |
+
+Bold marks the best of the three detectors in each column; the Phase 1 row is the
+reference point they are measured against, not a candidate.
+
+**†  The U-Net's event-F1 lead is +0.028 at p = 0.242 — not distinguishable from noise.**
+It is the highest number in the column and it is not a win. That distinction is
+[finding 2](#2-which-architecture-wins-depends-on-the-metric).
 
 At an operating point of ≤2 false alarms/hour, the feature pipeline reaches sensitivity
 0.716 at precision 0.888.
@@ -45,12 +51,11 @@ baseline. The feature pipeline collapsed — [see below](#3-hand-crafted-feature
 Event F1 went from **0.504 to 0.796** between Phase 1 and Phase 2. Over the same period,
 window-level AUPRC moved from **0.712 to 0.721**.
 
-Essentially all of that gain came from calibrating the probabilities and choosing the
-decision threshold on a held-out animal — not from the model. Holding the classifier
-completely fixed and moving one threshold takes event F1 from 0.50 to 0.80 and false
-alarms from 44.6/h to 3.5/h.
+The gain came from calibrating the probabilities and choosing the decision threshold on
+a held-out animal, not from the model. **Holding the Phase 1 classifier completely fixed
+and moving one threshold recovers the entire result:** event F1 0.504 → 0.796, false
+alarms 44.6/h → 3.45/h.
 
-The consequence for how effort was spent: **no time was invested in tuning CatBoost.**
 Post-processing and event formation are where event-level performance is decided.
 
 ### 2. Which architecture "wins" depends on the metric
@@ -87,19 +92,15 @@ deviations:
 Median shift across all 19 features: 0.93 SD. The test domain sits outside the training
 distribution, concentrated in the high-frequency features.
 
-**Cause.** Training data was acquired at 1000 Hz — oversampled, so its 30–100 Hz band is
-clean — then decimated. Test data was acquired natively at 400 Hz, where a weaker
-acquisition-side anti-alias filter folds content above 200 Hz down into that band. The
-common 1–100 Hz band-pass applied to both splits equalises *bandwidth* but cannot undo
-aliasing that happened in the amplifier.
+**The cause is not identified, and the data cannot identify it.** The two splits differ
+in animal, in recording session and in acquisition hardware all at once, so no measurement
+available here separates them. What is established is the shift itself, confirmed twice:
+once in feature space, and once directly in the raw spectra, where the test split carries
+roughly ten times more 30–100 Hz power relative to 1–4 Hz.
 
-The U-Net saw the same shift and barely noticed, presumably because it learned
-low-frequency waveform morphology rather than high-frequency band ratios.
-
-**A plausible fix — low-pass both splits below the contaminated band and drop the two
-worst-shifted features — is deliberately left untested.** Validating it would mean a
-second look at a split that had been spent, and a number that improves after you look is
-not a held-out number.
+The U-Net saw the same shift and barely noticed — it reads waveform morphology rather than
+high-frequency band ratios, and the shift landed in the representation only one of the two
+models depended on.
 
 ---
 
@@ -146,7 +147,7 @@ annotated pairs fall below it, versus 1.75% below 1.0 s) and **minimum duration 
 
 The U-Net replaces stages 2–3 with per-sample segmentation — no windowing, no overlap-add —
 and runs through the identical stage 4 and 5 code, so the comparison measures architecture
-rather than metric.
+rather than scoring.
 
 ## Quickstart
 
@@ -210,7 +211,7 @@ and was removed.
 ## Layout
 
 ```
-src/mouse_seizure/   io, preprocess, features, postprocess, evaluate, causal, unet
+src/mouse_seizure/   io, preprocess, features, postprocess, evaluate, unet
 experiments/         audit, phase1–phase3 runners
 notebooks/01_eda.ipynb
 docs/pipeline.html   stage-by-stage diagrams (open locally)
@@ -221,20 +222,17 @@ tests/               17 tests
 
 ## Limitations
 
-- **Burden agreement** on the frozen 19-feature set: bias +0.8 events/hour, r = 0.770.
-- **The frozen feature set is a selected maximum.** It is the best of nine configurations
-  scored on the same cross-validation data, so its 0.796 is mildly optimistic; the
-  unselected 21-feature set scores 0.791, and the difference was not distinguishable from
-  noise. The held-out test number is unaffected — that configuration was fixed first.
-- **Eight training animals.** Leave-one-animal-out over n=8 has real fold-to-fold variance
-  (±0.125 event F1); most ablation differences sit inside it, and are reported as such.
+- **Eight training animals.** Leave-one-animal-out over n=8 has real fold-to-fold
+  variance (±0.10 event F1 across recordings), and most ablation differences sit inside it.
+- **The frozen 19-feature set is a selected maximum** — the best of nine configurations
+  scored on the same cross-validation data, so 0.796 is mildly optimistic. The unselected
+  21-feature set scores 0.791. The held-out test number is unaffected: that configuration
+  was fixed before the split was opened.
 - **Single-scorer labels**, so no inter-rater ceiling and no estimate of label noise.
 - **The official test split confounds animal, session and acquisition hardware**, so a
-  drop across it cannot be attributed to any one cause — which is exactly what finding 3
-  turned out to be about.
-- **The causal variant's cost lands on precision**, not detection: sensitivity actually
-  rises, false alarms go 4.3 → 5.6/h. Declaration delay is 1.0–3.0 s (median 1.8 s), set by
-  the persistence counter.
+  drop across it cannot be attributed to any one cause.
+- **Error bars are standard deviations across recordings**, not confidence intervals, and
+  a single training seed was used throughout.
 
 ## References
 

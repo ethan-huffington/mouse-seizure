@@ -30,8 +30,8 @@ the next artifact to write.
   project, not the classifier. A dense 1-D U-Net (per-sample segmentation, no windowing) is a
   planned later extension, kept as a comparison against this baseline — not a replacement.
 - **The classifier is not the bottleneck.** Post-processing and event formation drive
-  event-level performance far more than model choice. Do not spend effort tuning CatBoost
-  before the post-processing chain is right.
+  event-level performance far more than model choice. Get the post-processing chain right
+  first.
 - **Evaluation uses `timescoring`** (the SzCORE reference implementation) rather than
   hand-written overlap matching, so results are comparable to published numbers.
   Its defaults are scaled for human clinical seizures (30 s / 60 s tolerance collars, 90 s
@@ -122,7 +122,7 @@ precision 0.888.
 
 **Window AUPRC barely moved (0.712 → 0.721) while event F1 rose 0.29.** The entire gain
 came from calibration and threshold selection, not from the classifier. This is the
-project's central claim, measured twice. Do not tune CatBoost.
+project's central claim, measured twice.
 
 ### Ablations (leave one feature group out, event F1 vs 0.791 full)
 
@@ -182,39 +182,6 @@ have.
 - Sample-level F1 is 0.633, well below the published 0.90 (which is sample-level on the
   official test split with a U-Net). Not comparable yet: different split, different task
   framing. Phase 3 should run the official test split for a like-for-like number.
-
-## Phase 3 -- causal / real-time variant (recorded)
-
-Same 19 features, same folds, same animals; the only change is that nothing may look
-forward. `sosfilt` instead of `sosfiltfilt`, trailing-window probabilities, and a
-persistence counter instead of median smoothing. Features are rebuilt from causally
-filtered signal (separate cache in `data/interim/features_causal`) -- reusing offline
-features would measure a domain shift, not the constraint.
-
-| | offline | causal | paired p |
-|---|---|---|---|
-| event F1 | 0.796 | 0.786 | 0.368 (within noise) |
-| event sensitivity | 0.805 | 0.836 | 0.451 (within noise) |
-| event precision | 0.828 | 0.797 | **0.003** |
-| false alarms / hour | 4.31 | 5.63 | **0.008** |
-
-**Going real-time costs almost nothing in F1.** The cost is specifically in precision and
-false-alarm rate, not in detection ability -- sensitivity actually rises. Do not report
-this as "no cost"; report it as "the cost lands on precision".
-
-**Two different latency numbers, do not conflate them:**
-
-- **Onset localisation error** (how accurate the reported boundary is): median 0.00 s,
-  IQR -0.50 to +1.00 s, p90 2.00 s over 18,441 matched events. Quantised to the 0.5 s
-  stride, so this is "within one step". Negative values are real: the detector sometimes
-  starts firing before the annotated onset.
-- **Declaration delay** (how long before the system *knows*, the number a closed-loop
-  device cares about): 1.0-3.0 s, median 1.8 s, set entirely by the persistence counter
-  N x 0.5 s.
-
-Onsets are reported where evidence began, not where the counter fired, so the declaration
-delay is carried separately rather than hidden inside the onset. That is why the two
-numbers differ.
 
 **Hardware note:** Apple M4, 10-core GPU, 17 GB unified, Metal 4. PyTorch MPS is available,
 so the U-Net does not need cloud compute.
@@ -316,8 +283,7 @@ a spent split.
    event formation, event-level metrics, and burden stats. Produces an honest baseline number
    on day one that every later change is measured against.
 2. **Make it good** — full feature set, artifact handling, post-processing tuning, ablations.
-3. **Comparison and writeup** — *complete*. Causal variant, U-Net, official test split
-   (spent), README.
+3. **Comparison and writeup** — *complete*. U-Net, official test split (spent), README.
 
 ## Library spine
 
